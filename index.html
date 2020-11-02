@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WHR - Project Manager</title>
+<meta charset="UTF-8">
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+
+
+  
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<!-- <link type="text/css" rel="stylesheet" media="screen" href="../dhis-web-commons/javascripts/jQuery/ui/css/redmond/jquery-ui.css">
+<link type="text/css" rel="stylesheet" media="screen" href="../dhis-web-commons/javascripts/jQuery/calendars/css/jquery.calendars.picker.css">
+<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/jquery.utils.js"></script>
+<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/jquery.metadata.js"></script>
+<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/ui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/ui/jquery.blockUI.js"></script> -->
+
+
+
+
+<script src="js/app/util.js"></script>
+<script src="js/app/RESTUtil.js"></script>
+<script src="js/app/projectManager.js"></script>
+<script src="js/app/catOptionDetails.js"></script>
+
+<link rel="stylesheet" href="css/app/style.css">
+
+
+</head>
+
+<body>
+
+	<!--- Header -->
+	<div id="header">
+		<img id="headerBanner" src="../../31/staticContent/logo_banner" style="cursor:pointer;max-width: 175px;max-height: 44px;padding-left: 40px;/* left: 400px; */">
+		<span id="headerText" style="cursor:pointer" title="View home page"></span>
+		
+		<div id="headerRightSideControls">
+			<a href="#" target="_blank" style="color: White;" title="App version number (Click for version detail page)">v <span id="currentVersion">0.1</span></a>
+				| <button type="button" id="closeButton"><span nameid="closeButton" title="Close this app and go back to home page.">Close</span></button>
+		</div>
+	</div>
+
+
+	<!-- Params selection -->
+	<div class="content-area">
+		<div class="param-area">
+			<table>
+				<tr>
+					<td><label for="orgunit">Entity</label></td>
+					<td><label for="period">Year</label></td>
+				</tr>
+				<tr>
+					<td><input id="orgunit" placeholder="Enter to search" mandatory="true"></td>
+					<td><input id="period" mandatory="true"></td>
+					<td><button class="btn btn-primary" id="searchBtn">SEARCH</button></td>
+				</tr>
+			</table>
+		   
+		   
+	   </div>
+
+		<table class="data-list" id="catOptionListTb">
+			<thead>
+				<tr>
+					<td>Project Number</td>
+					<td>Project Name</td>
+					<td>Start Date</td>
+					<td>End Date</td>
+					<td>Type</td>
+					<td>Flag 1</td>
+					<td>Flag 2</td>
+					<td>Flag 3</td>
+				</tr>
+			</thead>
+			
+			<tbody></tbody>
+
+		</table>
+	</div>
+
+	<!-- DIALOG for editing/adding a catOption -->
+	
+	<div id="catOptDetailsDiv">
+		
+		<table class="catOption-details">
+			<thead>
+				<tr>
+					<th colspan='5' keyword="opt:A9iqiKIprTh">Project Details</th>
+				</tr>
+			<thead>
+			
+			<tbody>
+				<tr class="title">
+					<td colspan="5"><label keyword="opt:sMlGJGkzB9v">Project Name</label></td>
+				</tr>
+				<tr>
+					<td colspan="5"><input type="text" id="name" maxlength="100"></td>
+				</tr>
+				
+				
+				<tr class="title">
+					<td><label keyword="opt:E4Ff4ytGr0A">Short Name</label></td>
+					<td><label keyword="opt:SkYkkx3qDyh">Project Number</label></td>
+					<td><label keyword="opt:jKBCC1IkLCB">Start Date</label></td>
+					<td><label keyword="opt:gdGTDs6secU">End Date</label></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><input type="text" id="shortName" maxlength="30"></td>
+					<td><input type="text" id="code" maxlength="30"></td>
+					<td><input type="text" id="startDate" style="width:80%;"></td>
+					<td><input type="text" id="endDate" style="width:80%;"></td>
+					<td><input type="checkbox" id="onGoing"> <label for="onGoing" keyword="opt:e2vH7dQUXJ1">On Going</label></td>
+				</tr>
+				<tr class="title">
+					<td colspan="5"><label keyword="opt:ToRfbjJS35h">Project Type <span style="color:red">*</span></label></td>
+				</tr>
+				
+				<tr>
+					<td colspan="5">
+						<input type="text" id="projectType" disabled mandatory="true">
+						<div id="projectTypeOptionDiv" style="width:100%;display:none;"></div>
+					</td>
+				</tr>
+				
+			</tbody>
+
+		</table>
+
+
+		
+		<!-- --------------------------------------------------------------------- -->
+		<!-- Implementation Strategies TABLE -->
+
+		<table class="imp-details" id="implStategies">
+		<thead>
+			<tr>
+			<th keyword="opt:xIQampcKDHE">Implementation Strategies</th>
+			</tr>
+			<thead>
+			
+			<tbody></tbody>
+		</table>
+
+		<!-- Add button -->
+		<div style="width:100%;text-align:right">
+			<button class="ui-button ui-widget ui-corner-all" id="implStrategiesShowDialogBtn" style="margin-top: 10px;"><span class="ui-icon  ui-icon-plus"></span><span keyword="opt:vI9siTdorSG">Add</span></button>
+		</div>
+		
+
+		<!-- --------------------------------------------------------------------- -->
+		<!-- Implementation Strategies Dialog -->
+
+		<div id="searchImplStrategiesDialogDiv" style="display:none;">
+
+			<div class="form-group">
+				<select class="form-control" id="implStrategiesGroup">
+					<option value="">[Please select]</option>
+				</select>
+			</div>
+			<div class="form-group" id="implStrategiesOOption" style="height:250px;overflow-y:auto;border:1px solid #dcd8d8"></div>
+
+			<button class="btn btn-primary" id="addImplStrategiesBtn" keyword="opt:KqY9dEjWhSe">SUBMIT</button>
+			<button class="btn btn-default" id="closeImplStrategiesBtn" keyword="opt:D0aws2oDGCl">CANCEL</button>
+
+		</div>
+	
+
+		<!-- --------------------------------------------------------------------- -->
+		<!-- Target Populations Dialog -->
+
+
+		<br>
+		<table class="target-populations" id="targetPopulations">
+		<thead>
+			<tr>
+			<th colspan='3' keyword="opt:EoclirmyFg0">Target Populations</th>
+			</tr>
+			<thead>
+			
+			<tbody>
+				<tr><td></td></tr>
+			</tbody>
+		</table>
+		
+		
+
+		<!-- Add button  -->
+		<div style="width:100%;text-align:right">
+			<button class="ui-button ui-widget ui-corner-all" id="targetPopulationsShowDialogBtn" style="margin-top: 10px;"><span class="ui-icon  ui-icon-plus"></span> <span keyword="opt:vI9siTdorSG">Add</span></button>
+		</div>
+		
+
+		<!-- --------------------------------------------------------------------- -->
+		<!-- Target Populations Dialog -->
+
+		<div id="searchTargetPopulationsDialogDiv" style="display:none;height: 320px;min-height:320px;">
+
+			<div class="form-group" id="targetPopulationsOOption" style="height:220px;overflow-y:auto;border:1px solid #dcd8d8"></div>
+
+			<button class="btn btn-primary" id="addTargetPopulationsBtn" keyword="opt:KqY9dEjWhSe">SUBMIT</button>
+			<button class="btn btn-default" id="closeTargetPopulationsBtn" keyword="opt:D0aws2oDGCl">CANCEL</button>
+
+		</div>
+
+
+		<!-- --------------------------------------------------------------------- -->
+		<!-- Edit/Save form button -->
+
+		<hr style="border-top: 1px solid black;">
+
+		<div style="width:100%;text-align:right">
+			<button class="ui-button ui-widget ui-corner-all" id="editBtn" style="margin-top: 10px;">EDIT</button>
+			<button class="ui-button ui-widget ui-corner-all" id="saveBtn" style="margin-top: 10px;display:none">SAVE</button>
+			<button class="btn btn-warning" id="cancelBtn" style="margin-top: 10px;display:none">CANCEL</button>
+		</div>
+
+	</div>
+
+
+</body>
+
+<script>
+
+	// =========================================================
+	// On Page Load Run
+
+	$( document ).ready( function() 
+	{
+		new ProjectManager();
+	});
+</script>
+</html>

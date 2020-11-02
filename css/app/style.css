@@ -1,0 +1,269 @@
+
+/*----------------------------------------------------------------------------*/
+/* Header Related                                                        */
+/*----------------------------------------------------------------------------*/
+
+#header {
+	background-color: #467e4a;
+	height: 48px;
+	position: fixed;
+	z-index: 10;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	box-shadow: 0 0 3px #222;
+}
+
+#headerBanner {
+	position: absolute;
+	top: 13px;
+	left: 55px;
+}
+
+#headerText {
+	position: absolute;
+	top: 15px;
+	left: 175px;
+	font-weight: bold;
+	color: #fff;
+	font-size: 16px;
+	font-family: LiberationSans, arial, sans-serif;
+}
+
+#headerRightSideControls {
+	height: 20px;
+	position: fixed;
+	z-index: 11;
+	top: 11px;
+	right: 4px;
+}
+
+
+/*----------------------------------------------------------------------------*/
+/* Contain Page                                                       */
+/*----------------------------------------------------------------------------*/
+
+.content-area {
+	padding-top: 60px;
+    padding-left: 10px;
+}
+
+
+.param-area label{
+	color: #ccc6c6;
+    font-size: 11px;
+}
+
+.param-area input, .param-area select
+{
+	width: 200px;
+	font-size: 11px;
+	border-bottom: 1px solid black;
+	border-top: 5px solid #fff;
+	border-left: 5px solid #fff;
+	border-right: 5px solid #fff;
+	box-shadow: 0 0 black;
+	margin-right: 10px;
+}
+
+.param-area table td{
+	margin-right: 20px;
+}
+
+
+
+/*----------------------------------------------------------------------------*/
+/* Table data list                                                     */
+/*----------------------------------------------------------------------------*/
+
+/* For table */
+table.data-list {
+    width: 100%;
+    margin-top: 40px;
+}
+
+table.data-list td, table.data-list th {
+    padding: 6px;
+}
+
+/* For table header */
+table.data-list th {
+    border-bottom: 1px black solid;
+    border-right: 1px black solid;
+}
+
+table.data-list th:last-child {
+    border-right: 0px;
+}
+
+
+/* For table body - TEXT ALIGN */
+
+table.data-list td:first-child {
+    text-align: right;
+}
+
+table.data-list td:nth-child(2), table.data-list td:nth-child(5) {
+    text-align: left;
+}
+
+table.data-list td:nth-child(3), table.data-list td:nth-child(4)
+	,table.data-list td:nth-child(6),table.data-list td:nth-child(7) ,table.data-list td:nth-child(8)  {
+    text-align: center;
+}
+
+
+/* For DIALOG of catOption details */
+
+ .catOption-details
+ {
+	 border: 0px;
+	 width:100%;
+ }
+ 
+ .catOption-details th
+ {
+	 font-size: 16px;
+	 width: 100%;
+	 border: 0px;
+	 padding-left: 0px;
+ }
+ 
+ .catOption-details td
+ {
+	 border: 0px;
+ }
+
+ .catOption-details label
+ {
+	 color: #d3d1d1;
+	 font-size: 10px;
+	 font-weight: normal;
+ }
+ 
+ .catOption-details input[type='text'], .catOption-details select
+ {
+	 outline: 0;
+	 border-width: 0 0 1px;
+	 border-color: #d3d1d1;
+	 margin-left: 5px;
+	 width: 95%;
+	 margin-bottom: 20px;
+	 padding-top: 0px;
+ }
+ 
+ 
+ .catOption-details input[type='text']:focus, .catOption-details select:focus {
+	 border-color: black;
+ }
+ 
+ .catOption-details input[type='checkbox']
+ {
+	 margin-left: 30px;
+ }
+ 
+ .option{
+	 margin-top: 0px !important;
+ }
+ .option label{
+	 font-weight: normal !important;
+	 margin-left: 10px;
+ }
+
+ .option input[type="checkbox"]
+ {
+	 margin-left: 10px;
+		margin-right: 10px;
+ }
+
+ .option:nth-child(2n+2) {
+	 background: #e9e9e9;
+ }
+
+
+ .ui-datepicker-month, .ui-datepicker-year
+ {
+	 color: black;
+ }
+
+ /* Implementation details */
+ 
+ .imp-details
+ {
+	 border: 0px;
+	 width:100%;
+ }
+ 
+ .imp-details th
+ {
+	 font-size: 16px;
+	 width: 100%;
+	 text-align: left;
+	 padding-bottom: 10px;
+	 border-bottom: 1px solid;
+	 border-top: 0px;
+	 border-right: 0px;
+	 border-left: 0px;
+ }
+ 
+ .imp-details td
+ {
+	 border: 0px;
+ }
+
+ .imp-details button
+ {
+	 width: 95%;
+	 text-align: left !important;
+	 margin-left: 10px;
+	 margin-top: 10px;
+	 border-radius: 20px;
+ }
+
+ /* Target Populations */
+ .target-populations
+ {
+	 border: 0px;
+	 width:100%;
+ }
+ 
+ .target-populations th
+ {
+	 font-size: 16px;
+	 width: 100%;
+	 text-align: left;
+	 padding-bottom: 10px;
+	 border-bottom: 1px solid;
+	 border-top: 0px;
+	 border-right: 0px;
+	 border-left: 0px;
+ }
+ 
+ .target-populations td
+ {
+	 border: 0px;
+ }
+
+ .target-populations button
+ {
+	 text-align: left !important;
+	 margin-left: 10px;
+	 margin-top: 10px;
+	 border-radius: 20px;
+ }
+
+
+
+/*----------------------------------------------------------------------------*/
+/* For validation */
+/*----------------------------------------------------------------------------*/
+
+span.error
+{
+	color: red;
+}
+
+input.error, select.error
+{
+	border-bottom: 1px solid red;
+}
