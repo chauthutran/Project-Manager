@@ -19,12 +19,12 @@ Util.setEnable = function( elementTag )
  * Get a column of table by column index. The index starts from 1 **/
 Util.getTableColumnByIdx = function( rowTag, colIdx )
 {
-	return rowTag.find("td:nth-child('" + colIdx + "')");
+	return rowTag.find("td:nth-child(" + colIdx + ")");
 }
 
 Util.setTableColumnValue = function( rowTag, colIdx, value )
 {
-	Util.getTableColumnByIdx( rowTag, colIdx, value );
+	Util.getTableColumnByIdx( rowTag, colIdx).html( value );
 }
 
 Util.findItemFromList = function( list, value, propertyName )

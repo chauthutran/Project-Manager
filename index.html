@@ -11,12 +11,10 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="js/jQuery/jquery.blockUI.js"></script>
 
-
-
-
   
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <!-- <link type="text/css" rel="stylesheet" media="screen" href="../dhis-web-commons/javascripts/jQuery/ui/css/redmond/jquery-ui.css">
 <link type="text/css" rel="stylesheet" media="screen" href="../dhis-web-commons/javascripts/jQuery/calendars/css/jquery.calendars.picker.css">
@@ -100,6 +98,11 @@
 			<tbody></tbody>
 
 		</table>
+
+		<!-- Add button -->
+		<div style="width:100%;text-align:right">
+			<button class="btn btn-primary" id="addNewCatOptionBtn" style="margin-top: 10px;display:none;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt:vI9siTdorSG"> ADD NEW PROJECT</span></button>
+		</div>
 	</div>
 
 	<!-- DIALOG for editing/adding a catOption -->
@@ -137,13 +140,25 @@
 					<td><input type="checkbox" id="onGoing"> <label for="onGoing" keyword="opt:e2vH7dQUXJ1">On Going</label></td>
 				</tr>
 				<tr class="title">
-					<td colspan="5"><label keyword="opt:ToRfbjJS35h">Project Type <span style="color:red">*</span></label></td>
+					<td colspan="2"><label keyword="opt:ToRfbjJS35h">Project Type <span style="color:red">*</span></label></td>
+					<td><label>Flag 1</label></td>
+					<td><label>Flag 2</label></td>
+					<td><label>Flag 3</label></td>
 				</tr>
 				
 				<tr>
-					<td colspan="5">
+					<td colspan="2">
 						<input type="text" id="projectType" disabled mandatory="true">
 						<div id="projectTypeOptionDiv" style="width:100%;display:none;"></div>
+					</td>
+					<td>
+						<img src="img/statusFail.png">
+					</td>
+					<td>
+						<img src="img/statusGood.png">
+					</td>
+					<td>
+						<img src="img/statusWarning.png">
 					</td>
 				</tr>
 				
@@ -168,7 +183,7 @@
 
 		<!-- Add button -->
 		<div style="width:100%;text-align:right">
-			<button class="btn btn-primary" id="implStrategiesShowDialogBtn" style="margin-top: 10px;"><span class="ui-icon  ui-icon-plus"></span><span keyword="opt:vI9siTdorSG">Add</span></button>
+			<button class="btn btn-primary" id="implStrategiesShowDialogBtn" style="margin-top: 10px;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt:vI9siTdorSG">Add</span></button>
 		</div>
 		
 
@@ -211,7 +226,7 @@
 
 		<!-- Add button  -->
 		<div style="width:100%;text-align:right">
-			<button class="btn btn-primary" id="targetPopulationsShowDialogBtn" style="margin-top: 10px;"><span class="ui-icon  ui-icon-plus"></span> <span keyword="opt:vI9siTdorSG">Add</span></button>
+			<button class="btn btn-primary" id="targetPopulationsShowDialogBtn" style="margin-top: 10px;"><span class="glyphicon glyphicon-plus"> </span> <span keyword="opt:vI9siTdorSG">Add</span></button>
 		</div>
 		
 

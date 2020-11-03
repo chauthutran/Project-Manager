@@ -8,6 +8,8 @@ function ProjectManager()
     me.searchBtnTag = $("#searchBtn");
     me.paramFormTag = $("div.param-area");
 
+    me.addNewCatOptionBtnTag = $("#addNewCatOptionBtn");
+;
     me.loadingDivTag = $("#loadingDiv");
     me.loadingMsgTag = $("#loadingMsg");
     me.catOptionListTbTag = $("#catOptionListTb");
@@ -30,6 +32,7 @@ function ProjectManager()
     me.loadedOptionSet = false;
     me.loadedProjectTypeList = false;
 
+    me.catOptionDetailsFormObj;
     me.metaData = [];
     me.catOptionList = [];
 
@@ -112,6 +115,7 @@ function ProjectManager()
         me.hideDataTablePage();
       });
 
+
       me.searchBtnTag.click( function(){
         if( ValidationUtil.checkMandatoryValidation( me.paramFormTag ) )
         {
@@ -119,6 +123,9 @@ function ProjectManager()
         }
       });
 
+      me.addNewCatOptionBtnTag.click(function(){
+        me.catOptionDetailsFormObj.showAddDialogForm();
+      })
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -146,6 +153,7 @@ function ProjectManager()
     {
       if( me.loadedOptionSet && me.loadedProjectTypeList )
       {
+        me.catOptionDetailsFormObj = new CatOptionDetailsForm( me );
         MsgManager.appUnblock();
       }
     }
@@ -283,7 +291,7 @@ function ProjectManager()
     {
       rowTag.click( function(){
         var catOptId = rowTag.attr("catOptId");
-        new CatOptionDetailsForm( me, catOptId );
+        me.catOptionDetailsFormObj.showUpdateDialogForm( catOptId );
       });
     }
 
@@ -318,12 +326,14 @@ function ProjectManager()
     {
       me.loadingDivTag.hide();
       me.catOptionListTbTag.show("fast");
+      me.addNewCatOptionBtnTag.show();
     }
 
     me.hideDataTable = function()
     {
       me.loadingDivTag.show();
       me.catOptionListTbTag.hide();
+      me.addNewCatOptionBtnTag.hide();
     }
 
     me.hideDataTablePage = function()
@@ -336,6 +346,7 @@ function ProjectManager()
     {
       me.loadingDivTag.hide();
       me.catOptionListTbTag.hide();
+      me.addNewCatOptionBtnTag.hide();
     }
 
     // ------------------------------------------------------------------------------------------------

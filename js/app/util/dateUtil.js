@@ -8,7 +8,7 @@ DateUtil.setDateRageFields = function( startDate, endDate )
 {
 	var dates = $('#' + startDate.attr("id") + ', #' + endDate.attr("id")).datepicker(
 	{
-		dateFormat: "dd M yy",
+		dateFormat: "dd-mm-yy",
 		defaultDate: "+1w",
 		changeMonth: true,
 		changeYear: true,

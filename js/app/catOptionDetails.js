@@ -1,5 +1,5 @@
 
-function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
+function CatOptionDetailsForm( _projectManagerObj  )
 {
     var me = this;
     
@@ -62,16 +62,38 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 	me.init = function()
 	{
         me.metaData = me.projectManagerObj.metaData;
-        me.catOptionData = me.projectManagerObj.catOptionList[_catOptId];
 
         me.initilizeForm();
         me.setup_Events();
+	}
 
+	me.showUpdateDialogForm = function( catOptId )
+	{
+		me.resetForm();
+
+        me.catOptionData = me.projectManagerObj.catOptionList[catOptId];
         if( me.catOptionData )
         {
             me.populateCatOptionDetails();
-        }
-       
+		}
+
+		// Disabel all input fields and buttons which were generated in "Implementation Strategies" and "Target Populations"
+        me.disableForm();
+
+        // Open FROM as dialog
+        me.catOptDetailsDivTag.dialog( "open" );
+	}
+
+	
+	me.showAddDialogForm = function( catOptId )
+	{
+		me.resetForm();
+
+		me.catOptionData = undefined;
+
+		// Disabel all input fields and buttons which were generated in "Implementation Strategies" and "Target Populations"
+        me.enableForm();
+
         // Open FROM as dialog
         me.catOptDetailsDivTag.dialog( "open" );
 	}
@@ -81,16 +103,21 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 
     me.initilizeForm = function()
     {
-        // Reset Form
-        me.disableForm();
-        me.catOptDetailsDivTag.find("input,select").val("");
-        me.implStategiesTbTag.find("tbody").find("tr").remove();
-        me.targetPopulationsTbTag.find("tbody tr td button").remove();
-
+		me.resetForm();
         me.projectTypes_PopulateRadios();
         me.setup_DialogForms();
     }
     
+	me.resetForm = function()
+	{
+		// Reset Form
+		me.catOptDetailsDivTag.find("input[type!='radio'],select").val("");
+		me.catOptDetailsDivTag.find("input[type='radio']:first").prop("checked");
+		me.catOptDetailsDivTag.find("input[type='radio']:first").click();
+		me.implStategiesTbTag.find("tbody").find("tr").remove();
+		me.targetPopulationsTbTag.find("tbody tr td button").remove();
+	}
+
 
 	// ----------------------------------------------------------------------------------------------
     // Set up events
@@ -127,7 +154,7 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 		});
 
         me.cancelBtnTag.click(function(){
-            Util.disableForm();
+			me.catOptDetailsDivTag.dialog( "close" );
         })
 
 		// OnGoing checkbox
@@ -204,19 +231,6 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 			me.searchImplStrategiesDialogDivTag.dialog( "close" );
 		});
 
-
-		me.implStategiesTbTag.find("button").each( function(){
-			var buttonTag = $(this);
-			buttonTag.click( function(){
-				var dataValue = buttonTag[0].innerText;
-				var ok = confirm("Are you sure you want to delete '" + dataValue + "' ?");
-				if( ok )
-				{
-					buttonTag.remove();
-				}
-			})
-		});
-
 	}
 	
 	me.setup_Events_TargetPopulations = function()
@@ -254,19 +268,6 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 
 		me.closeTargetPopulationsBtnTag.click( function(){
 			me.searchTargetPopulationsDialogDivTag.dialog( "close" );
-		});
-
-
-		me.targetPopulationsTbTag.find("button").each( function(){
-			var buttonTag = $(this);
-			buttonTag.click( function(){
-				var dataValue = buttonTag[0].innerText;
-				var ok = confirm("Are you sure you want to delete '" + dataValue + "' ?");
-				if( ok )
-				{
-					buttonTag.remove();
-				}
-			})
 		});
 
 	}
@@ -404,8 +405,20 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 
 	// ----------------------------------------------------------------------------------------------
 	// For saving data
-
+	
 	me.saveCatOptionData = function()
+	{
+		if( me.catOptionData ) // Update catOption
+		{
+			me.updateCatOptionData();
+		}
+		else
+		{
+			me.addCatOptionData();
+		}
+	}
+
+	me.updateCatOptionData = function()
 	{
 		var jsonData = me.generateJsonData();
 		var url = me.CATEGORY_OPTION_URL + me.catOptionData.id;
@@ -414,9 +427,9 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 
 			me.disableForm();
             me.projectManagerObj.catOptionList[me.catOptionData.id] = jsonData;
-            me.projectManagerObj.updateDataRow( catOptionData );
+            me.projectManagerObj.updateDataRow( jsonData );
 
-            me.searchImplStrategiesDialogDivTag.dialog( "close" );
+            me.catOptDetailsDivTag.dialog( "close" );
             alert("Save data successfully !");
 
 		}, function( a, b ){ // actionError
@@ -433,13 +446,12 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 		RESTUtil.submitData( "POST", jsonData, url, function( response ){ // actionSuccess
 
             me.disableForm();
-            
-            var catOptId = response.id;
+            var catOptId = response.response.uid;
             jsonData.id = catOptId;
             me.projectManagerObj.catOptionList[catOptId] = jsonData;
-            me.projectManagerObj.addNewDataRow( catOptionData );
+            me.projectManagerObj.addNewDataRow( jsonData );
 
-            me.searchImplStrategiesDialogDivTag.dialog( "close" );
+			me.catOptDetailsDivTag.dialog( "close" );
             alert("Add new data successfully !");
 
 		}, function( a, b ){ // actionError
@@ -567,7 +579,12 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
         {
             jsonData = JSON.parse( JSON.stringify( me.catOptionData ) );
         }
-
+		else // Assign to selected orgunit in case adding a new catOption
+		{
+			jsonData.organisationUnits = [];
+			jsonData.organisationUnits.push( {"id" : me.projectManagerObj.orgunitTag.attr("ouId")});
+		}
+		
 		jsonData.name = me.nameTag.val();
 		jsonData.shortName = me.shortNameTag.val();
 		jsonData.code = me.codeTag.val();
@@ -591,6 +608,8 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 		{
 			delete jsonData.endDate;
 		}
+
+		
 
 
 
@@ -656,6 +675,23 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 			{
 				table.find("tbody td:first").append( buttonTag );
 			}
+
+			// Add event for the button
+			buttonTag.click( function(){
+				var dataValue = buttonTag[0].innerText;
+				var ok = confirm("Are you sure you want to delete '" + dataValue + "' ?");
+				if( ok )
+				{
+					if( isAddRow ) 
+					{
+						buttonTag.closest("tr").remove();
+					}
+					else
+					{
+						buttonTag.remove();
+					}
+				}
+			});
 		}
 	}
 
@@ -696,6 +732,7 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 		me.editBtnTag.removeAttr("disabled");
 		me.cancelBtnTag.removeAttr("disabled");
 		me.projectTypeTag.show();
+		me.cancelBtnTag.show();
 		me.editBtnTag.show();
 		me.saveBtnTag.hide();
 	}
@@ -709,6 +746,7 @@ function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 		me.projectTypeOptionDivTag.show();
 		me.implStrategiesShowDialogBtnTag.show();
 		me.targetPopulationsShowDialogBtnTag.show();
+		me.cancelBtnTag.show();
         me.saveBtnTag.show();
 	}
 	
