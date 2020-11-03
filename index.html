@@ -8,7 +8,8 @@
 <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="js/jQuery/jquery.blockUI.js"></script>
 
 
 
@@ -29,8 +30,11 @@
 
 
 
-<script src="js/app/util.js"></script>
-<script src="js/app/RESTUtil.js"></script>
+<script src="js/app/util/validationUtil.js"></script>
+<script src="js/app/util/util.js"></script>
+<script src="js/app/util/dateUtil.js"></script>
+<script src="js/app/util/RESTUtil.js"></script>
+<script src="js/app/util/msgManager.js"></script>
 <script src="js/app/projectManager.js"></script>
 <script src="js/app/catOptionDetails.js"></script>
 
@@ -63,7 +67,7 @@
 				</tr>
 				<tr>
 					<td><input id="orgunit" placeholder="Enter to search" mandatory="true"></td>
-					<td><input id="period" mandatory="true"></td>
+					<td><select id="period" mandatory="true"></select></td>
 					<td><button class="btn btn-primary" id="searchBtn">SEARCH</button></td>
 				</tr>
 			</table>
@@ -71,17 +75,25 @@
 		   
 	   </div>
 
-		<table class="data-list" id="catOptionListTb">
+	  
+		<div id="loadingDiv" class="loaderDiv" style="display:none;">
+			<br><br><br>
+			<img src="img/ajax-loader-circle.gif">
+			<br><br><br>
+			<p id="loadingMsg"></p>
+		</div>
+
+		<table class="data-list" id="catOptionListTb" style="display:none;">
 			<thead>
 				<tr>
-					<td>Project Number</td>
-					<td>Project Name</td>
-					<td>Start Date</td>
-					<td>End Date</td>
-					<td>Type</td>
-					<td>Flag 1</td>
-					<td>Flag 2</td>
-					<td>Flag 3</td>
+					<th>Project Number</th>
+					<th>Project Name</th>
+					<th>Start Date</th>
+					<th>End Date</th>
+					<th>Type</th>
+					<th>Flag 1</th>
+					<th>Flag 2</th>
+					<th>Flag 3</th>
 				</tr>
 			</thead>
 			
@@ -92,7 +104,7 @@
 
 	<!-- DIALOG for editing/adding a catOption -->
 	
-	<div id="catOptDetailsDiv">
+	<div id="catOptDetailsDiv" style="display:none;">
 		
 		<table class="catOption-details">
 			<thead>
@@ -120,8 +132,8 @@
 				<tr>
 					<td><input type="text" id="shortName" maxlength="30"></td>
 					<td><input type="text" id="code" maxlength="30"></td>
-					<td><input type="text" id="startDate" style="width:80%;"></td>
-					<td><input type="text" id="endDate" style="width:80%;"></td>
+					<td><input type="text" id="startDate" style="width:80%;" readonly></td>
+					<td><input type="text" id="endDate" style="width:80%;" readonly></td>
 					<td><input type="checkbox" id="onGoing"> <label for="onGoing" keyword="opt:e2vH7dQUXJ1">On Going</label></td>
 				</tr>
 				<tr class="title">
@@ -156,7 +168,7 @@
 
 		<!-- Add button -->
 		<div style="width:100%;text-align:right">
-			<button class="ui-button ui-widget ui-corner-all" id="implStrategiesShowDialogBtn" style="margin-top: 10px;"><span class="ui-icon  ui-icon-plus"></span><span keyword="opt:vI9siTdorSG">Add</span></button>
+			<button class="btn btn-primary" id="implStrategiesShowDialogBtn" style="margin-top: 10px;"><span class="ui-icon  ui-icon-plus"></span><span keyword="opt:vI9siTdorSG">Add</span></button>
 		</div>
 		
 
@@ -199,7 +211,7 @@
 
 		<!-- Add button  -->
 		<div style="width:100%;text-align:right">
-			<button class="ui-button ui-widget ui-corner-all" id="targetPopulationsShowDialogBtn" style="margin-top: 10px;"><span class="ui-icon  ui-icon-plus"></span> <span keyword="opt:vI9siTdorSG">Add</span></button>
+			<button class="btn btn-primary" id="targetPopulationsShowDialogBtn" style="margin-top: 10px;"><span class="ui-icon  ui-icon-plus"></span> <span keyword="opt:vI9siTdorSG">Add</span></button>
 		</div>
 		
 
@@ -222,9 +234,9 @@
 		<hr style="border-top: 1px solid black;">
 
 		<div style="width:100%;text-align:right">
-			<button class="ui-button ui-widget ui-corner-all" id="editBtn" style="margin-top: 10px;">EDIT</button>
-			<button class="ui-button ui-widget ui-corner-all" id="saveBtn" style="margin-top: 10px;display:none">SAVE</button>
 			<button class="btn btn-warning" id="cancelBtn" style="margin-top: 10px;display:none">CANCEL</button>
+			<button class="btn btn-primary" id="editBtn" style="margin-top: 10px;">EDIT</button>
+			<button class="btn btn-primary" id="saveBtn" style="margin-top: 10px;display:none">SAVE</button>
 		</div>
 
 	</div>

@@ -1,47 +1,45 @@
 
-function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
+function CatOptionDetailsForm( _projectManagerObj, _catOptId  )
 {
     var me = this;
     
-    me.metaData = _metaData;
-    me.catOptionData = _catOptionDetailsData;
+    me.projectManagerObj = _projectManagerObj;
+    me.metaData;
+    me.catOptionData;
 
-	me.CATEGORY_OPTION_URL = "../api/categoryOptions/";
+	me.CATEGORY_OPTION_URL = RESTUtil. API_BASED_URL + "categoryOptions/";
 
     me.catOptDetailsDivTag = $("#catOptDetailsDiv");
-	me.nameTag =  me.catOptsDetailsDivTag.find("#name");
-	me.shortNameTag =  me.catOptsDetailsDivTag.find("#shortName");
-	me.codeTag =  me.catOptsDetailsDivTag.find("#code");
-	me.startDateTag =  me.catOptsDetailsDivTag.find("#startDate");
-	me.endDateTag =  me.catOptsDetailsDivTag.find("#endDate");
-	me.onGoingTag =  me.catOptsDetailsDivTag.find("#onGoing");
+	me.nameTag =  me.catOptDetailsDivTag.find("#name");
+	me.shortNameTag =  me.catOptDetailsDivTag.find("#shortName");
+	me.codeTag =  me.catOptDetailsDivTag.find("#code");
+	me.startDateTag =  me.catOptDetailsDivTag.find("#startDate");
+	me.endDateTag =  me.catOptDetailsDivTag.find("#endDate");
+	me.onGoingTag =  me.catOptDetailsDivTag.find("#onGoing");
 
-	me.projectTypeTag =  me.catOptsDetailsDivTag.find("#projectType");
+	me.projectTypeTag =  me.catOptDetailsDivTag.find("#projectType");
 	me.projectTypeOptionDivTag = $("#projectTypeOptionDiv");
-	me.implStategiesTbTag =  me.catOptsDetailsDivTag.find("#implStategies");
-	me.targetPopulationsTbTag =  me.catOptsDetailsDivTag.find("#targetPopulations");
+	me.implStategiesTbTag =  me.catOptDetailsDivTag.find("#implStategies");
+	me.targetPopulationsTbTag =  me.catOptDetailsDivTag.find("#targetPopulations");
 
-	me.editBtnTag =  me.catOptsDetailsDivTag.find("#editBtn");
-    me.saveBtnTag =  me.catOptsDetailsDivTag.find("#saveBtn");
-    me.cancelBtnTag = me.catOptsDetailsDivTag.find("#cancelBtn");
+	me.editBtnTag =  me.catOptDetailsDivTag.find("#editBtn");
+    me.saveBtnTag =  me.catOptDetailsDivTag.find("#saveBtn");
+    me.cancelBtnTag = me.catOptDetailsDivTag.find("#cancelBtn");
 
 	// For implStrategies Dialog
-	me.implStrategiesShowDialogBtnTag =  me.catOptsDetailsDivTag.find("#implStrategiesShowDialogBtn");
-	me.searchImplStrategiesDialogDivTag =  me.catOptsDetailsDivTag.find("#searchImplStrategiesDialogDiv");
-	me.implStrategiesGroupTag =  me.catOptsDetailsDivTag.find("#implStrategiesGroup");
-	me.implStrategiesOOptionTag =  me.catOptsDetailsDivTag.find("#implStrategiesOOption");
-	me.addImplStrategiesBtnTag =  me.catOptsDetailsDivTag.find("#addImplStrategiesBtn");
-	me.closeImplStrategiesBtnTag =  me.catOptsDetailsDivTag.find("#closeImplStrategiesBtn");
+	me.implStrategiesShowDialogBtnTag =  me.catOptDetailsDivTag.find("#implStrategiesShowDialogBtn");
+	me.searchImplStrategiesDialogDivTag =  me.catOptDetailsDivTag.find("#searchImplStrategiesDialogDiv");
+	me.implStrategiesGroupTag =  me.catOptDetailsDivTag.find("#implStrategiesGroup");
+	me.implStrategiesOOptionTag =  me.catOptDetailsDivTag.find("#implStrategiesOOption");
+	me.addImplStrategiesBtnTag =  me.catOptDetailsDivTag.find("#addImplStrategiesBtn");
+	me.closeImplStrategiesBtnTag =  me.catOptDetailsDivTag.find("#closeImplStrategiesBtn");
 
 	// For Target Populations Dialog
-	me.targetPopulationsShowDialogBtnTag =  me.catOptsDetailsDivTag.find("#targetPopulationsShowDialogBtn");
-	me.searchTargetPopulationsDialogDivTag =  me.catOptsDetailsDivTag.find("#searchTargetPopulationsDialogDiv");
-	me.targetPopulationsOOptionTag =  me.catOptsDetailsDivTag.find("#targetPopulationsOOption");
-	me.addTargetPopulationsBtnTag =  me.catOptsDetailsDivTag.find("#addTargetPopulationsBtn");
-	me.closeTargetPopulationsBtnTag =  me.catOptsDetailsDivTag.find("#closeTargetPopulationsBtn");
-
-
-	me.catOptionTag = $("#category-OPZj38sNHhm");c// me.catOptionData.id
+	me.targetPopulationsShowDialogBtnTag =  me.catOptDetailsDivTag.find("#targetPopulationsShowDialogBtn");
+	me.searchTargetPopulationsDialogDivTag =  me.catOptDetailsDivTag.find("#searchTargetPopulationsDialogDiv");
+	me.targetPopulationsOOptionTag =  me.catOptDetailsDivTag.find("#targetPopulationsOOption");
+	me.addTargetPopulationsBtnTag =  me.catOptDetailsDivTag.find("#addTargetPopulationsBtn");
+	me.closeTargetPopulationsBtnTag =  me.catOptDetailsDivTag.find("#closeTargetPopulationsBtn");
 
 
 	me.implStrategiesOptSetId = "SU52yMajLXm";
@@ -63,39 +61,19 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 
 	me.init = function()
 	{
+        me.metaData = me.projectManagerObj.metaData;
+        me.catOptionData = me.projectManagerObj.catOptionList[_catOptId];
+
         me.initilizeForm();
-        me.populateCatOptionDetails();
+        me.setup_Events();
 
-		me.saveBtnTag.hide();
-
-        
-        me.setup_Events_ImpStrategies();
-        me.setup_Events_TargetPopulations();
-        me.setup_Events_CatOptionDetails();
-        
-		Util.setupDialogForm( "Implement Strategies", me.searchImplStrategiesDialogDivTag, 500, 410 );
-        Util.setupDialogForm( "Target Populations", me.searchTargetPopulationsDialogDivTag, 350, 320 );
-        
-        
-        me.disableForm();
-	}
-
-	me.checkMadatoryField = function()
-	{
-		var flag = true;
-		 me.catOptsDetailsDivTag.find("input[mandatory],select[mandatory]").each( function(){
-			if( $(this).val() == "" )
-			{
-				$(this).parent().append("<span class='error'>Please enter value for this field</span>");
-				flag = false;
-			}
-			else
-			{
-				$(this).parent().find("span.error").remove();
-			}
-		});
-
-		return flag;
+        if( me.catOptionData )
+        {
+            me.populateCatOptionDetails();
+        }
+       
+        // Open FROM as dialog
+        me.catOptDetailsDivTag.dialog( "open" );
 	}
 
 	// ----------------------------------------------------------------------------------------------
@@ -103,13 +81,14 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 
     me.initilizeForm = function()
     {
+        // Reset Form
+        me.disableForm();
+        me.catOptDetailsDivTag.find("input,select").val("");
+        me.implStategiesTbTag.find("tbody").find("tr").remove();
+        me.targetPopulationsTbTag.find("tbody tr td button").remove();
+
         me.projectTypes_PopulateRadios();
-
-        // Populate data for impStrategiesDialog
-        me.impStrategiesDialog_PopulateCheckBoxes(  me.metaData["optionSets"] );
-
-         // Populate data for targetPopulationsDialog
-        me.targetPopulationsDialog_PopulateCheckboxes( me.metaData["optionSets"] );
+        me.setup_DialogForms();
     }
     
 
@@ -141,7 +120,7 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 
 		// Save form button
 		me.saveBtnTag.click( function(){
-			if( me.checkMadatoryField() )
+			if( ValidationUtil.checkMandatoryValidation( me.catOptDetailsDivTag ) )
 			{
 				me.saveCatOptionData();
 			}
@@ -150,6 +129,7 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
         me.cancelBtnTag.click(function(){
             Util.disableForm();
         })
+
 		// OnGoing checkbox
 		me.onGoingTag.click( function(){
 			if( $(this).prop("checked") )
@@ -293,17 +273,30 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 
 
 	// ----------------------------------------------------------------------------------------------
+    // Set up DIALOG forms for Implementation Strategies and Target Populations
+
+    me.setup_DialogForms = function()
+    {
+        // Populate data for impStrategiesDialog
+        me.impStrategiesDialog_PopulateCheckBoxes(  me.metaData[ProjectManager.METADTA_TYPE_OPTIONSET] );
+        Util.setupDialogForm( "Implement Strategies", me.searchImplStrategiesDialogDivTag, 500, 410 );
+        
+        // Populate data for targetPopulationsDialog
+        me.targetPopulationsDialog_PopulateCheckboxes( me.metaData[ProjectManager.METADTA_TYPE_OPTIONSET] );
+        Util.setupDialogForm( "Target Populations", me.searchTargetPopulationsDialogDivTag, 350, 320 );
+    }
+
+	// ----------------------------------------------------------------------------------------------
     // For Project Types
     
-
 	// Populate radios for "ProjectTypes"
 	me.projectTypes_PopulateRadios = function()
 	{
-        me.projectTypeList = me.metaData["projectType"];
+        me.projectTypeList = me.metaData[ProjectManager.METADTA_TYPE_PROJECT_TYPE].categoryOptionGroups;
         for( var i in me.projectTypeList )
         {
             var catOptionGroup = me.projectTypeList[i];
-            var radioTag = me.createRadioOpt( catOptionGroup, response.id );
+            var radioTag = me.createRadioOpt( catOptionGroup, me.metaData[ProjectManager.METADTA_TYPE_PROJECT_TYPE].id );
             me.projectTypeOptionDivTag.append( radioTag );
 
             // Fill selected value for INPUT of Project Type when a radio input is checked
@@ -320,7 +313,6 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 	// ----------------------------------------------------------------------------------------------
     // Populate catOption details data
     
-
     // Populate data for "Project Details" part
 	me.populateCatOptionDetails = function()
 	{
@@ -330,22 +322,19 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 
         if( me.catOptionData.startDate )
         {
-            var displayStartDate = DateUtil.converToDisplayDate( me.catOptionData.startDate );
+            var displayStartDate = DateUtil.convertToDisplayDate( me.catOptionData.startDate );
             me.startDateTag.val( displayStartDate );
         }
 
         if( me.catOptionData.endDate )
         {
-            var displayEndDate = DateUtil.converToDisplayDate( me.catOptionData.endDate );
+            var displayEndDate = DateUtil.convertToDisplayDate( me.catOptionData.endDate );
             me.endDateTag.val( displayEndDate );
-
             me.onGoingTag.prop("checked", false);
-            Util.setEnable( me.endDateTag );
         }
         else
         {
             me.onGoingTag.prop("checked", true);
-            Util.setDisable( me.endDateTag );
         }
 
         // Populate attribute values
@@ -419,19 +408,43 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 	me.saveCatOptionData = function()
 	{
 		var jsonData = me.generateJsonData();
-		var url = me.CATEGORY_OPTION_URL + me.catOptionTag.val(); //
+		var url = me.CATEGORY_OPTION_URL + me.catOptionData.id;
 
-		RESTUtil.submitData( url, "PUT", jsonData, function(){ // actionSuccess
-
-			me.catOptionData = jsonData;
+		RESTUtil.submitData( "PUT", jsonData, url, function(){ // actionSuccess
 
 			me.disableForm();
+            me.projectManagerObj.catOptionList[me.catOptionData.id] = jsonData;
+            me.projectManagerObj.updateDataRow( catOptionData );
 
-			alert("Save data successfully !");
+            me.searchImplStrategiesDialogDivTag.dialog( "close" );
+            alert("Save data successfully !");
 
-		}, function(){ // actionError
+		}, function( a, b ){ // actionError
 
-			alert("There is some issue while saving data here.");
+			alert("There is some issue while saving data.");
+		});
+    }
+    
+    me.addCatOptionData = function()
+	{
+		var jsonData = me.generateJsonData();
+		var url = me.CATEGORY_OPTION_URL;
+
+		RESTUtil.submitData( "POST", jsonData, url, function( response ){ // actionSuccess
+
+            me.disableForm();
+            
+            var catOptId = response.id;
+            jsonData.id = catOptId;
+            me.projectManagerObj.catOptionList[catOptId] = jsonData;
+            me.projectManagerObj.addNewDataRow( catOptionData );
+
+            me.searchImplStrategiesDialogDivTag.dialog( "close" );
+            alert("Add new data successfully !");
+
+		}, function( a, b ){ // actionError
+
+			alert("There is some issue while saving data.");
 		});
 	}
 	
@@ -549,7 +562,12 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 
 	me.generateJsonData = function()
 	{
-		var jsonData = JSON.parse( JSON.stringify( me.catOptionData ) );
+        var jsonData = {};
+        if( me.catOptionData ) 
+        {
+            jsonData = JSON.parse( JSON.stringify( me.catOptionData ) );
+        }
+
 		jsonData.name = me.nameTag.val();
 		jsonData.shortName = me.shortNameTag.val();
 		jsonData.code = me.codeTag.val();
@@ -557,9 +575,9 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 		// Start date
 		if( me.startDateTag.val() != "" )
 		{
-			jsonData.startDate = DateUtil.converToDbDate( me.startDateTag.val() );
+			jsonData.startDate = DateUtil.convertToDbDate( me.startDateTag.val() );
 		}
-		else
+		else if( jsonData.startDate )
 		{
 			delete jsonData.startDate;
 		}
@@ -567,9 +585,9 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 		// End date
 		if( !me.onGoingTag.prop("checked") && me.endDateTag.val() != "" )
 		{
-			jsonData.endDate = DateUtil.converToDbDate( me.endDateTag.val() );
+			jsonData.endDate = DateUtil.convertToDbDate( me.endDateTag.val() );
 		}
-		else
+		else if( jsonData.endDate )
 		{
 			delete jsonData.endDate;
 		}
@@ -577,10 +595,8 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 
 
 		// Get data for Implement and TargerPopulations
-		var attributeValues = JSON.parse( JSON.stringify( jsonData.attributeValues ) );
-		jsonData.attributeValues = [];
-
-
+        jsonData.attributeValues = [];
+        
 		// -----------------------------------------------------------------------------------------------------
 		// Get attribute values of Implement Strategies
 		var codeList = [];
@@ -672,12 +688,13 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 	
 	me.disableForm = function()
 	{
-		 me.catOptsDetailsDivTag.find("input,select, button").attr("disabled", "disabled");
+		me.catOptDetailsDivTag.find("input,select,button").attr("disabled", "disabled");
 		me.projectTypeOptionDivTag.hide();
 		me.implStrategiesShowDialogBtnTag.hide();
 		me.targetPopulationsShowDialogBtnTag.hide();
 
 		me.editBtnTag.removeAttr("disabled");
+		me.cancelBtnTag.removeAttr("disabled");
 		me.projectTypeTag.show();
 		me.editBtnTag.show();
 		me.saveBtnTag.hide();
@@ -685,14 +702,14 @@ function CatOptionDetailsForm( _metaData, _catOptionDetailsData )
 	
 	me.enableForm = function()
 	{
-		 me.catOptsDetailsDivTag.find("input,select,button").removeAttr("disabled" );
+		me.catOptDetailsDivTag.find("input,select,button").removeAttr("disabled" );
 		me.projectTypeTag.hide();
 		me.editBtnTag.hide();
 
 		me.projectTypeOptionDivTag.show();
 		me.implStrategiesShowDialogBtnTag.show();
 		me.targetPopulationsShowDialogBtnTag.show();
-		me.saveBtnTag.show();
+        me.saveBtnTag.show();
 	}
 	
 	// ----------------------------------------------------------------------------------------------

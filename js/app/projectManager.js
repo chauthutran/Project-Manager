@@ -8,9 +8,11 @@ function ProjectManager()
     me.searchBtnTag = $("#searchBtn");
     me.paramFormTag = $("div.param-area");
 
+    me.loadingDivTag = $("#loadingDiv");
+    me.loadingMsgTag = $("#loadingMsg");
     me.catOptionListTbTag = $("#catOptionListTb");
     me.catOptDetailsDivTag = $("#catOptDetailsDiv");
-
+     
 
     me.PARAM_ORGUNIT_ID = "@PARAM_ORGUNIT_ID";
     me.PARAM_START_DATE = "@PARAM_START_DATE";
@@ -37,6 +39,8 @@ function ProjectManager()
 
     me.init = function()
     {
+        MsgManager.appUnblock();
+
         me.retrieveOptionSets();
         me.retrieveProjectTypeList();
         me.setAutoCompleteForOrgUnit();
@@ -45,6 +49,8 @@ function ProjectManager()
 
         // Set up DIALOG form for showing / updating / adding a catOption details
         Util.setupDialogForm( "Project Details", me.catOptDetailsDivTag, 600, 700 );
+
+        me.setup_Events();
     }
 
 
@@ -67,27 +73,13 @@ function ProjectManager()
     
                 response( ouList );
               });
-
-              // $.ajax( {
-              //   url: me.ORGUNIT_QUERY_URL + searchKey,
-              //   dataType: "json",
-              //   success: function( data ) {
-              //     var ouList = $.map( data.organisationUnits, function ( item ) {
-              //         return {
-              //             label: item.name,
-              //             value: item.name,
-              //             id: item.id
-              //         };
-              //     } );
-
-              //     response( ouList );
-              //   }
-              // });
             },
             minLength: 2,
             select: function( event, ui ) {
               me.orgunitTag.attr( "ouId", ui.item.id );
               me.orgunitTag.autocomplete( 'close' );
+
+              me.hideDataTablePage();
             },
             change: function( event, ui ) {
                 if( ui.item == null ) {
@@ -104,10 +96,10 @@ function ProjectManager()
       var year = eval( date.getFullYear() );
 
       var startPeriod = year - 10;
-      var endPeriod = year + 10;
+      var endPeriod = year + 3;
 
       me.periodTag.append("<option value=''>[Please choose a option]</option>");
-      for( var year=endPeriod; year>=startPeriod; year--- )
+      for( var year=endPeriod; year>=startPeriod; year-- )
       {
         me.periodTag.append("<option value='" + year + "'>" + year + "</option>");
       }
@@ -116,47 +108,17 @@ function ProjectManager()
 
     me.setup_Events = function()
     {
+      me.periodTag.change( function(){
+        me.hideDataTablePage();
+      });
+
       me.searchBtnTag.click( function(){
-        if( me.checkMandatoryValidation( me.paramFormTag ) )
+        if( ValidationUtil.checkMandatoryValidation( me.paramFormTag ) )
         {
           me.retrieveCatOptionsList();
         }
       });
-    }
 
-    // ------------------------------------------------------------------------------------------------
-    // Check validation
-
-    me.checkMandatoryValidation = function( formTag )
-    {
-      var valid = true;
-      formTag.find("input[mandatory='true'],select[mandatory='true']").each( function(){
-        if( $(this).val() == "" )
-        {
-          me.addErrorSpanTag( $(this) );
-          valid = false;
-        }
-        else
-        {
-          me.removeErrorSpanTag( $(this) );
-        }
-      });
-
-      return valid;
-    }
-
-    me.addErrorSpanTag = function( fieldTag )
-    {
-      var spanTag = $("<span class='error'>This field is required.</span>");
-      spanTag.insertAfter( fieldTag );
-
-      fieldTag.addClass("error");
-    }
-
-    me.removeErrorSpanTag = function( fieldTag )
-    {
-      fieldTag.parent().find(".error").remove();
-      fieldTag.removeClass("error")
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -165,7 +127,7 @@ function ProjectManager()
     me.retrieveOptionSets = function()
     {
       RESTUtil.retrieveData( me.OPTION_SET_QUERY_URL, function( response ){
-        me.metaData["optionSets"] = response.optionSets;
+        me.metaData[ProjectManager.METADTA_TYPE_OPTIONSET] = response.optionSets;
         me.loadedOptionSet = true;
         me.afterMetadataLoad();
       });
@@ -174,7 +136,7 @@ function ProjectManager()
     me.retrieveProjectTypeList = function()
     {
       RESTUtil.retrieveData( me.PROJECT_TYPE_QUERY_URL, function( response ){
-        me.metaData["projectType"] = response.categoryOptionGroups;
+        me.metaData[ProjectManager.METADTA_TYPE_PROJECT_TYPE] = response;
         me.loadedProjectTypeList = true;
         me.afterMetadataLoad();
       });
@@ -184,7 +146,7 @@ function ProjectManager()
     {
       if( me.loadedOptionSet && me.loadedProjectTypeList )
       {
-        // TODO - Hide Form Loading here ....
+        MsgManager.appUnblock();
       }
     }
 
@@ -205,9 +167,22 @@ function ProjectManager()
       url = url.replace( me.PARAM_END_DATE, dateRange.endDate );
 
       RESTUtil.retrieveData( url, function( response ){
+        
+        me.loadingMsgTag.html("Populate data to table ...");
         var categoryOptions = response.categoryOptions;
         me.populateTableData( categoryOptions );
         me.catOptionList = me.resolveCatOptionList( categoryOptions );
+      
+      }, function(){ // error
+
+      }, function(){
+        
+        me.loadingMsgTag.html("Retrieving data ...");
+        me.hideDataTable();
+      
+      }, function(){
+        me.showDataTable();
+      
       });
     }
 
@@ -218,24 +193,89 @@ function ProjectManager()
     // Populate data
     me.populateTableData = function( catOptionList ){
       var tbody = me.catOptionListTbTag.find("tbody");
+      tbody.find("tr").remove();
 
       for( var i in catOptionList )
       {
-        var catOpt = catOptionList[i];
-        var startDate = ( catOpt.startDate ) ? DateUtil.convertToDisplayDate( catOpt.startDate ) : "";
-        var endDate = ( catOpt.endDate ) ? DateUtil.convertToDisplayDate( catOpt.endDate ) : "";
-
-        var rowTag = $("<tr catOptId='" + catOpt.id + "'></tr>");
-        rowTag.append("<td>" + catOpt.code + "<td>");
-        rowTag.append("<td>" + catOpt.name + "<td>");
-        rowTag.append("<td>" + startDate + "<td>");
-        rowTag.append("<td>" + endDate + "<td>");
-
-        me.setup_DataTable_Row_Events( rowTag );
-
-        tbody.append( rowTag );
-
+        me.addNewDataRow( catOptionList[i] );
       }
+    }
+
+    // Add a new row
+    me.addNewDataRow = function( catOptionData ){
+      var startDate = ( catOptionData.startDate ) ? DateUtil.convertToDisplayDate( catOptionData.startDate ) : "";
+      var endDate = ( catOptionData.endDate ) ? DateUtil.convertToDisplayDate( catOptionData.endDate ) : "";
+
+      var rowTag = $("<tr catOptId='" + catOptionData.id + "' style='cursor:pointer;'></tr>");
+      rowTag.append("<td>" + catOptionData.code + "</td>");
+      rowTag.append("<td>" + catOptionData.name + "</td>");
+      rowTag.append("<td>" + startDate + "</td>");
+      rowTag.append("<td>" + endDate + "</td>");
+
+      var attrValues = catOptionData.attributeValues;
+      if( attrValues )
+      {
+        var projectTypeAttrValue = Util.findItemFromList( attrValues, ProjectManager.projectTypesAttrId, "id" );
+        var projectType = (projectTypeAttrValue) ? me.getAttrValue( attrValue, ProjectManager.METADTA_TYPE_PROJECT_TYPE ) : "";
+        rowTag.append("<td>" + projectType + "</td>");
+      }
+      else
+      {
+        rowTag.append("<td></td>");
+      }
+
+      
+      rowTag.append("<td></td>");
+      rowTag.append("<td></td>");
+      rowTag.append("<td></td>");
+
+      me.setup_DataTable_Row_Events( rowTag );
+
+      var tbody = me.catOptionListTbTag.find("tbody");
+      tbody.append( rowTag );
+    }
+
+    // Update an existing row
+    me.updateDataRow = function( catOptionData )
+    {
+      var rowTag = me.catOptionListTbTag.find("tbody tr[catOptId='" + catOptionData.id + "']");
+
+      var startDate = ( catOptionData.startDate ) ? DateUtil.convertToDisplayDate( catOptionData.startDate ) : "";
+      var endDate = ( catOptionData.endDate ) ? DateUtil.convertToDisplayDate( catOptionData.endDate ) : "";
+
+      Util.setTableColumnValue( rowTag, 1, catOptionData.code );
+      Util.setTableColumnValue( rowTag, 2, catOptionData.name );
+      Util.setTableColumnValue( rowTag, 3, startDate );
+      Util.setTableColumnValue( rowTag, 4, endDate );
+      
+
+      var attrValues = catOptionData.attributeValues;
+      if( attrValues )
+      {
+        var projectTypeAttrValue = Util.findItemFromList( attrValues, ProjectManager.projectTypesAttrId, "id" );
+        var projectType = (projectTypeAttrValue) ? me.getAttrValue( attrValue, ProjectManager.METADTA_TYPE_PROJECT_TYPE ) : "";
+        Util.setTableColumnValue( rowTag, 5, projectType );
+      }
+
+    }
+
+    me.getAttrValue = function( attrValue, metaDataType )
+    {
+      var dataList = me.metaData[ metaDataType ];
+     
+      if( metaDataType == ProjectManager.METADTA_TYPE_OPTIONSET )
+      {
+        var foundItem = Util.findItemFromList( dataList, attrValue, "code" );
+        return (foundItem ) ? foundItem.name : "";
+      }
+      else if( metaDataType == ProjectManager.METADTA_TYPE_PROJECT_TYPE )
+      {
+        dataList = dataList.categoryOptionGroups;
+        var foundItem = Util.findItemFromList( dataList, attrValue, "id" );
+        return (foundItem ) ? foundItem.name : "";
+      }
+      
+      return "";
     }
 
     // Set events for each row of table after populate data
@@ -243,10 +283,7 @@ function ProjectManager()
     {
       rowTag.click( function(){
         var catOptId = rowTag.attr("catOptId");
-        var catOptionData = me.catOptionList[catOptId];
-
-        new CatOptionDetailsForm( me.metaData, catOptionData );
-        me.catOptDetailsDivTag.dialog( "open" );
+        new CatOptionDetailsForm( me, catOptId );
       });
     }
 
@@ -277,9 +314,42 @@ function ProjectManager()
       return result;
     }
 
+    me.showDataTable = function()
+    {
+      me.loadingDivTag.hide();
+      me.catOptionListTbTag.show("fast");
+    }
+
+    me.hideDataTable = function()
+    {
+      me.loadingDivTag.show();
+      me.catOptionListTbTag.hide();
+    }
+
+    me.hideDataTablePage = function()
+    {
+      me.loadingDivTag.hide();
+      me.catOptionListTbTag.hide();
+    }
+
+    me.hideDataTablePage = function()
+    {
+      me.loadingDivTag.hide();
+      me.catOptionListTbTag.hide();
+    }
+
     // ------------------------------------------------------------------------------------------------
     // RUN init method
 
     me.init();
 
 }
+
+
+ProjectManager.METADTA_TYPE_OPTIONSET = "optionSets";
+ProjectManager.METADTA_TYPE_PROJECT_TYPE = "projectType";
+
+
+ProjectManager.projectTypesAttrId = "xxx";
+ProjectManager.implStategiesAttrId = "kKB7KCMbSxR";
+ProjectManager.targetPopulationsAttrId = "JEjwUg7H3Vs";

@@ -46,6 +46,7 @@
 .content-area {
 	padding-top: 60px;
     padding-left: 10px;
+    padding-right: 10px;
 }
 
 
@@ -57,7 +58,6 @@
 .param-area input, .param-area select
 {
 	width: 200px;
-	font-size: 11px;
 	border-bottom: 1px solid black;
 	border-top: 5px solid #fff;
 	border-left: 5px solid #fff;
@@ -70,7 +70,9 @@
 	margin-right: 20px;
 }
 
-
+.ui-autocomplete-loading {
+	background: url('../../img/ajax-loader.gif') no-repeat right center!important;
+  }
 
 /*----------------------------------------------------------------------------*/
 /* Table data list                                                     */
@@ -86,7 +88,7 @@ table.data-list td, table.data-list th {
     padding: 6px;
 }
 
-/* For table header */
+/* For table HEADER BORDER */
 table.data-list th {
     border-bottom: 1px black solid;
     border-right: 1px black solid;
@@ -96,8 +98,18 @@ table.data-list th:last-child {
     border-right: 0px;
 }
 
+/* For table BODY - BORDER */
 
-/* For table body - TEXT ALIGN */
+table.data-list td {
+    border-bottom: 1px black solid;
+    border-right: 1px black solid;
+}
+
+table.data-list td:last-child {
+    border-right: 0px;
+}
+
+/* For table BODY - TEXT ALIGN */
 
 table.data-list td:first-child {
     text-align: right;
@@ -113,6 +125,25 @@ table.data-list td:nth-child(3), table.data-list td:nth-child(4)
 }
 
 
+table.data-list tr:nth-child(2n+2) {
+	background: #c4c4c426;
+}
+
+/* For table BODY - WIDTH */
+table#data-list td:first-child, table#data-list td:nth-child(3),table#data-list td:nth-child(4) {
+	width: 90px;
+}
+
+table.data-list td:nth-child(6),table.data-list td:nth-child(7) ,table.data-list td:nth-child(8)  {
+    width: 60px;
+}
+
+table.data-list td:nth-child(2)
+{
+	min-width: 300px;
+}
+
+/*-----------------------------------------------------------------------------------------------------*/
 /* For DIALOG of catOption details */
 
  .catOption-details
@@ -258,12 +289,14 @@ table.data-list td:nth-child(3), table.data-list td:nth-child(4)
 /* For validation */
 /*----------------------------------------------------------------------------*/
 
-span.error
+div.error
 {
 	color: red;
+	font-style: italic;
+	font-size: 11px;
 }
 
-input.error, select.error
+input.errorField, select.errorField
 {
 	border-bottom: 1px solid red;
 }
