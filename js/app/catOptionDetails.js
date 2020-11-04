@@ -432,9 +432,9 @@ function CatOptionDetailsForm( _projectManagerObj  )
             me.catOptDetailsDivTag.dialog( "close" );
             alert("Save data successfully !");
 
-		}, function( a, b ){ // actionError
+		}, function( errResponse ){ // actionError
 
-			alert("There is some issue while saving data.");
+			me.saveError( errResponse );
 		});
     }
     
@@ -454,12 +454,29 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			me.catOptDetailsDivTag.dialog( "close" );
             alert("Add new data successfully !");
 
-		}, function( a, b ){ // actionError
+		}, function( errResponse ){ // actionError
 
-			alert("There is some issue while saving data.");
+			me.saveError( errResponse );
 		});
 	}
 	
+
+	me.saveError = function( errResponse )
+	{
+		var message = "There are some issue while saving data.";
+
+		var errorReports = errResponse.response.errorReports;
+		if( errorReports.length > 0 )
+		{
+			for( var i in errorReports )
+			{
+				var errorReport = errorReports[i];
+				message+= "\n - " + errorReport.message;
+			}
+		}
+
+		alert( message );
+	}
 
 	// ----------------------------------------------------------------------------------------------
 	// For impStrategiesDialog

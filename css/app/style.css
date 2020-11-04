@@ -3,39 +3,63 @@
 /* Header Related                                                        */
 /*----------------------------------------------------------------------------*/
 
-#header {
-	background-color: #467e4a;
-	height: 48px;
+.header
+{
+	background: rgb(39, 102, 150);
+	display: flex;
 	position: fixed;
-	z-index: 10;
-	top: 0px;
-	left: 0px;
-	right: 0px;
-	box-shadow: 0 0 3px #222;
+	top: 0px;left: 0px;
+	width: 100%;
+	min-height: 48px;
+	align-items: center;
+	z-index: 1400;
 }
 
-#headerBanner {
-	position: absolute;
-	top: 13px;
-	left: 55px;
+.header div.title
+{
+	display: flex;
+	overflow: hidden;
 }
 
-#headerText {
-	position: absolute;
-	top: 15px;
-	left: 175px;
+
+.header img
+{
+	max-width: 175px;
+	max-height: 44px;
+	margin-left: 30px;
+}
+
+.header div.title a
+{
 	font-weight: bold;
-	color: #fff;
-	font-size: 16px;
-	font-family: LiberationSans, arial, sans-serif;
+	color: rgb(255, 255, 255);
+	margin-right: 10px;
 }
 
-#headerRightSideControls {
-	height: 20px;
+
+.header div.title a
+{
+	font-weight: bold;
+	color: rgb(255, 255, 255);
+	margin-right: 10px;
+}
+
+.header button
+{
+	margin-right: 10px;
+	margin-left: 10px;
+}
+
+.header div.header-right {
 	position: fixed;
-	z-index: 11;
-	top: 11px;
-	right: 4px;
+    right: 4px;
+}
+
+.header div.header-right a 
+{
+	color: White;
+	font-weight:normal;
+	font-size:11px;
 }
 
 
@@ -112,36 +136,39 @@ table.data-list td:last-child {
 /* For table BODY - TEXT ALIGN */
 
 table.data-list td:first-child {
-    text-align: right;
+	text-align: right;
+	width: 90px;
 }
 
-table.data-list td:nth-child(2), table.data-list td:nth-child(5) {
+table.data-list td:nth-child(2) {
+	text-align: left;
+	min-width: 300px;
+}
+
+table.data-list td:nth-child(3),table.data-list td:nth-child(4) {
+	text-align: center;
+	width: 90px;
+}
+
+table.data-list td:nth-child(5) {
     text-align: left;
 }
 
-table.data-list td:nth-child(3), table.data-list td:nth-child(4)
-	,table.data-list td:nth-child(6),table.data-list td:nth-child(7) ,table.data-list td:nth-child(8)  {
-    text-align: center;
+table.data-list td:nth-child(6),table.data-list td:nth-child(7) ,table.data-list td:nth-child(8)  {
+	text-align: center;
+	width: 60px;
 }
-
 
 table.data-list tr:nth-child(2n+2) {
 	background: #c4c4c426;
 }
 
-/* For table BODY - WIDTH */
-table#data-list td:first-child, table#data-list td:nth-child(3),table#data-list td:nth-child(4) {
-	width: 90px;
-}
 
-table.data-list td:nth-child(6),table.data-list td:nth-child(7) ,table.data-list td:nth-child(8)  {
-    width: 60px;
-}
-
-table.data-list td:nth-child(2)
+h3
 {
-	min-width: 300px;
+	margin-bottom: 30px;
 }
+
 
 /*-----------------------------------------------------------------------------------------------------*/
 /* For DIALOG of catOption details */

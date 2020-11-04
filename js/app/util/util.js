@@ -15,6 +15,7 @@ Util.setEnable = function( elementTag )
 	elementTag.removeAttr("disabled");
 }
 
+/** For TABLE */
 /** 
  * Get a column of table by column index. The index starts from 1 **/
 Util.getTableColumnByIdx = function( rowTag, colIdx )
@@ -27,6 +28,7 @@ Util.setTableColumnValue = function( rowTag, colIdx, value )
 	Util.getTableColumnByIdx( rowTag, colIdx).html( value );
 }
 
+/**  For  Array */
 Util.findItemFromList = function( list, value, propertyName )
 {
 	var item;
@@ -51,6 +53,42 @@ Util.findItemFromList = function( list, value, propertyName )
 	return item;
 };
 
+
+Util.sortByKey = function( array, key, noCase, order, emptyStringLast ) {
+	return array.sort( function( a, b ) {
+		
+		var x = a[key]; 
+		var y = b[key];
+
+		if ( x === undefined ) x = "";
+		if ( y === undefined ) y = "";
+
+		if ( noCase !== undefined && noCase )
+		{
+			x = x.toLowerCase();
+			y = y.toLowerCase();
+		}
+
+		if ( emptyStringLast !== undefined && emptyStringLast && ( x == "" || y == "" ) ) 
+		{
+			if ( x == "" && y == "" ) return 0;
+			else if ( x == "" ) return 1;
+			else if ( y == "" ) return -1;
+		}
+		else
+		{
+			if ( order === undefined )
+			{
+				return ( ( x < y ) ? -1 : ( ( x > y ) ? 1 : 0 ) );
+			}
+			else
+			{
+				if ( order == "Acending" ) return ( ( x < y ) ? -1 : ( ( x > y ) ? 1 : 0 ) );
+				else if ( order == "Decending" ) return ( ( x > y ) ? -1 : ( ( x < y ) ? 1 : 0 ) );
+			}
+		}
+	});
+};
 
 
 Util.setupDialogForm = function( title, dialogDivTag, width, height )

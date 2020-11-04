@@ -33,6 +33,7 @@
 <script src="js/app/util/dateUtil.js"></script>
 <script src="js/app/util/RESTUtil.js"></script>
 <script src="js/app/util/msgManager.js"></script>
+<script src="js/app/appHeader.js"></script>
 <script src="js/app/projectManager.js"></script>
 <script src="js/app/catOptionDetails.js"></script>
 
@@ -44,14 +45,22 @@
 <body>
 
 	<!--- Header -->
-	<div id="header">
-		<img id="headerBanner" src="../../31/staticContent/logo_banner" style="cursor:pointer;max-width: 175px;max-height: 44px;padding-left: 40px;/* left: 400px; */">
-		<span id="headerText" style="cursor:pointer" title="View home page"></span>
-		
-		<div id="headerRightSideControls">
-			<a href="#" target="_blank" style="color: White;" title="App version number (Click for version detail page)">v <span id="currentVersion">0.1</span></a>
-				| <button type="button" id="closeButton"><span nameid="closeButton" title="Close this app and go back to home page.">Close</span></button>
+	<div class="header">
+		<div class="title">
+			<a href="" style="min-width: 175px;" name="backToPage">
+				<img src="../../staticContent/logo_banner" name="dhisHeaderText">
+			</a>
 		</div>
+		
+		<div class="title">	
+			<a name="backToPage" href="../../../dhis-web-commons-about/redirect.action" name="dhisHeaderText">WHR Dev Service Statistics</a>
+		</div>
+		
+		<div class="header-right">
+			<a href="#" target="_blank" style="color: White;font-weight:normal;font-size:11px;" title="App version number (Click for version detail page)">v <span id="currentVersion">0.1</span></a>
+				| <button name="backToPage"><span title="Close this app and go back to home page.">Close</span></button>
+		</div>
+		
 	</div>
 
 
@@ -59,6 +68,9 @@
 	<div class="content-area">
 		<div class="param-area">
 			<table>
+				<tr>
+					<td><h3>Project Manager</h3></td>
+				</tr>
 				<tr>
 					<td><label for="orgunit">Entity</label></td>
 					<td><label for="period">Year</label></td>
@@ -78,7 +90,7 @@
 			<br><br><br>
 			<img src="img/ajax-loader-circle.gif">
 			<br><br><br>
-			<p id="loadingMsg"></p>
+			<p id="loadingMsg" style="font-style: italic;"></p>
 		</div>
 
 		<table class="data-list" id="catOptionListTb" style="display:none;">
@@ -110,11 +122,11 @@
 	<div id="catOptDetailsDiv" style="display:none;">
 		
 		<table class="catOption-details">
-			<thead>
+			<!-- <thead>
 				<tr>
 					<th colspan='5' keyword="opt:A9iqiKIprTh">Project Details</th>
 				</tr>
-			<thead>
+			<thead> -->
 			
 			<tbody>
 				<tr class="title">
@@ -266,6 +278,7 @@
 
 	$( document ).ready( function() 
 	{
+		new AppHeader();
 		new ProjectManager();
 	});
 </script>

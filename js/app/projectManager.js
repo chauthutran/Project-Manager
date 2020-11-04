@@ -21,16 +21,20 @@ function ProjectManager()
     me.PARAM_END_DATE = "@PARAM_END_DATE";
 
     me.ORGUNIT_QUERY_URL = RESTUtil.API_BASED_URL + "organisationUnits.json?level=5&fields=name,id&paging=false&filter=name:ilike:";
-    me.CATOPTION_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptions.json?fields=*&paging=false"
-                    + "&filter=name:ilike:prj"
-                    + "&filter=organisationUnits.id:eq:" +  me.PARAM_ORGUNIT_ID 
-                    + "&filter=startDate:ge:" + me.PARAM_START_DATE 
-                    + "&filter=startDate:le:" + me.PARAM_END_DATE;
     me.OPTION_SET_QUERY_URL = RESTUtil.API_BASED_URL + "optionSets.json?filter=code:like:ABR&fields=id,displayName,options[id,code,displayName]&paging=false";
     me.PROJECT_TYPE_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptionGroupSets/sLnFBYhOlKG.json?fields=id,categoryOptionGroups[id,displayName]";
                   
+    me.CATOPTION_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptions.json?fields=*&paging=false"
+                        + "&filter=name:ilike:prj"
+                        + "&filter=organisationUnits.id:eq:" +  me.PARAM_ORGUNIT_ID;
+    me.CATOPTION_QUERY_FITER_DATE_RANGE = "&filter=startDate:ge:" + me.PARAM_START_DATE + "&filter=startDate:le:" + me.PARAM_END_DATE;
+    me.CATOPTION_QUERY_FITER_EMPTY_DATE_RANGE = "&filter=startDate:null&filter=startDate:null";
+
+
     me.loadedOptionSet = false;
     me.loadedProjectTypeList = false;
+    me.loadedCatOptionsListWithDateRange = false;
+    me.loadedCatOptionsListwithutDateRange = false;
 
     me.catOptionDetailsFormObj;
     me.metaData = [];
@@ -162,44 +166,70 @@ function ProjectManager()
     // ------------------------------------------------------------------------------------------------
     // Retrieve catOption list
 
+
     me.retrieveCatOptionsList = function()
     {
       me.catOptionList = [];
 
+      me.loadingMsgTag.html("Retrieving data ...");
+      me.hideDataTable();
+
+      me.retrieveCatOptionsListWithDateRange();
+      me.retrieveCatOptionsListWithoutDateRange();
+    }
+
+    me.retrieveCatOptionsListWithDateRange = function()
+    {
       var dateRange = me.getPeriodDateRage( me.periodTag.val() );
       var ouId = me.orgunitTag.attr("ouId");
 
-      var url =  me.CATOPTION_QUERY_URL;
+      var url =  me.CATOPTION_QUERY_URL + me.CATOPTION_QUERY_FITER_DATE_RANGE;
       url = url.replace( me.PARAM_ORGUNIT_ID, ouId );
       url = url.replace( me.PARAM_START_DATE, dateRange.startDate );
       url = url.replace( me.PARAM_END_DATE, dateRange.endDate );
 
       RESTUtil.retrieveData( url, function( response ){
-        
-        me.loadingMsgTag.html("Populate data to table ...");
-        var categoryOptions = response.categoryOptions;
-        me.populateTableData( categoryOptions );
-        me.catOptionList = me.resolveCatOptionList( categoryOptions );
-      
-      }, function(){ // error
-
-      }, function(){
-        
-        me.loadingMsgTag.html("Retrieving data ...");
-        me.hideDataTable();
-      
-      }, function(){
-        me.showDataTable();
-      
+        me.loadedCatOptionsListWithDateRange = true;
+        me.afterLoadCatOptionsList( response.categoryOptions );
       });
+
     }
 
+    me.retrieveCatOptionsListWithoutDateRange = function()
+    {
+      var ouId = me.orgunitTag.attr("ouId");
+
+      var url =  me.CATOPTION_QUERY_URL + me.CATOPTION_QUERY_FITER_EMPTY_DATE_RANGE;
+      url = url.replace( me.PARAM_ORGUNIT_ID, ouId );
+
+      RESTUtil.retrieveData( url, function( response ){
+        me.loadedCatOptionsListwithutDateRange = true;
+        me.afterLoadCatOptionsList( response.categoryOptions );
+      });
+
+    }
+
+    me.afterLoadCatOptionsList = function( categoryOptions )
+    {
+      me.catOptionList = me.catOptionList.concat( categoryOptions );
+
+      if( me.loadedCatOptionsListWithDateRange && me.loadedCatOptionsListwithutDateRange )
+      {
+        me.catOptionList = Util.sortByKey( me.catOptionList, "name" );
+        me.loadingMsgTag.html("Populating data to table ...");
+        me.populateTableData( me.catOptionList );
+
+        me.catOptionList = me.resolveCatOptionList( me.catOptionList )
+        me.showDataTable();
+      }
+    }
 
     // ------------------------------------------------------------------------------------------------
     // Populate data in table / in dialog , set up events for rows in data table
 
     // Populate data
-    me.populateTableData = function( catOptionList ){
+    me.populateTableData = function( catOptionList )
+    {
       var tbody = me.catOptionListTbTag.find("tbody");
       tbody.find("tr").remove();
 
@@ -211,11 +241,12 @@ function ProjectManager()
 
     // Add a new row
     me.addNewDataRow = function( catOptionData ){
+      var code = ( catOptionData.code ) ? catOptionData.code : "";
       var startDate = ( catOptionData.startDate ) ? DateUtil.convertToDisplayDate( catOptionData.startDate ) : "";
       var endDate = ( catOptionData.endDate ) ? DateUtil.convertToDisplayDate( catOptionData.endDate ) : "";
 
       var rowTag = $("<tr catOptId='" + catOptionData.id + "' style='cursor:pointer;'></tr>");
-      rowTag.append("<td>" + catOptionData.code + "</td>");
+      rowTag.append("<td>" + code + "</td>");
       rowTag.append("<td>" + catOptionData.name + "</td>");
       rowTag.append("<td>" + startDate + "</td>");
       rowTag.append("<td>" + endDate + "</td>");
