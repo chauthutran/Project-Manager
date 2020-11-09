@@ -17,17 +17,31 @@ function ProjectManager()
      
 
     me.PARAM_ORGUNIT_ID = "@PARAM_ORGUNIT_ID";
-    me.PARAM_START_DATE = "@PARAM_START_DATE";
-    me.PARAM_END_DATE = "@PARAM_END_DATE";
+    me.PARAM_PERIOD_START_DATE = "@PARAM_PERIOD_START_DATE";
+    me.PARAM_PERIOD_END_DATE = "@PARAM_PERIOD_END_DATE";
+
+    me.optionSet_ImplementationStrategies = "SU52yMajLXm";
+    me.optionSet_TargetPopulations = "e3RJ6M8qB1h";
 
     me.ORGUNIT_QUERY_URL = RESTUtil.API_BASED_URL + "organisationUnits.json?level=5&fields=name,id&paging=false&filter=name:ilike:";
-    me.OPTION_SET_QUERY_URL = RESTUtil.API_BASED_URL + "optionSets.json?filter=code:like:ABR&fields=id,displayName,options[id,code,displayName]&paging=false";
-    me.PROJECT_TYPE_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptionGroupSets/sLnFBYhOlKG.json?fields=id,categoryOptionGroups[id,displayName]";
-                  
+    me.OPTION_SET_QUERY_URL = RESTUtil.API_BASED_URL + "optionSets.json?filter=id:in:[" + me.optionSet_ImplementationStrategies + "," + me.optionSet_TargetPopulations + "]" 
+                        + "&fields=id,displayName,options[id,code,displayName]&paging=false";
+    me.PROJECT_TYPE_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptionGroupSets/sLnFBYhOlKG.json?fields=id,categoryOptionGroups[id,displayName,categoryOptions[id,name]]";
     me.CATOPTION_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptions.json?fields=*&paging=false"
                         + "&filter=name:ilike:prj"
                         + "&filter=organisationUnits.id:eq:" +  me.PARAM_ORGUNIT_ID;
-    me.CATOPTION_QUERY_FITER_DATE_RANGE = "&filter=startDate:ge:" + me.PARAM_START_DATE + "&filter=startDate:le:" + me.PARAM_END_DATE;
+    
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Filter Query
+
+    // CatOption.startDate >= pe.startDate && CatOption.startDate <= pe.endDate
+    me.CATOPTION_QUERY_FITER_DATE_1 = "&filter=startDate:ge:" + me.PARAM_PERIOD_START_DATE + "&filter=startDate:le:" + me.PARAM_PERIOD_END_DATE;
+    // CatOption.startDate <= pe.endDate && CatOption.endDate is null
+    me.CATOPTION_QUERY_FITER_DATE_2 = "&filter=startDate:le:" + me.PARAM_PERIOD_END_DATE + "&filter=startDate:null";
+    // CatOption.endDate >= pe.startDate
+    me.CATOPTION_QUERY_FITER_DATE_3 = "&filter=endDate:ge:" + me.PARAM_PERIOD_START_DATE;
+    // CatOption.startDate is null & CatOption.endDate is null
     me.CATOPTION_QUERY_FITER_EMPTY_DATE_RANGE = "&filter=startDate:null&filter=startDate:null";
 
 
@@ -169,41 +183,29 @@ function ProjectManager()
 
     me.retrieveCatOptionsList = function()
     {
+      me.processCatOptions = 0;
       me.catOptionList = [];
 
       me.loadingMsgTag.html("Retrieving data ...");
       me.hideDataTable();
 
-      me.retrieveCatOptionsListWithDateRange();
-      me.retrieveCatOptionsListWithoutDateRange();
+      me.retrieveCatOptionsByQuery( me.CATOPTION_QUERY_FITER_DATE_1 );
+      me.retrieveCatOptionsByQuery( me.CATOPTION_QUERY_FITER_DATE_2 );
+      me.retrieveCatOptionsByQuery( me.CATOPTION_QUERY_FITER_DATE_3 );
+      me.retrieveCatOptionsByQuery( me.CATOPTION_QUERY_FITER_EMPTY_DATE_RANGE );
     }
 
-    me.retrieveCatOptionsListWithDateRange = function()
+    me.retrieveCatOptionsByQuery = function( filterQuery )
     {
-      var dateRange = me.getPeriodDateRage( me.periodTag.val() );
+      var dateRange = me.getPeriodDateRage();
       var ouId = me.orgunitTag.attr("ouId");
 
-      var url =  me.CATOPTION_QUERY_URL + me.CATOPTION_QUERY_FITER_DATE_RANGE;
+      var url =  me.CATOPTION_QUERY_URL + filterQuery;
       url = url.replace( me.PARAM_ORGUNIT_ID, ouId );
-      url = url.replace( me.PARAM_START_DATE, dateRange.startDate );
-      url = url.replace( me.PARAM_END_DATE, dateRange.endDate );
+      url = url.replace( me.PARAM_PERIOD_START_DATE, dateRange.startDate );
+      url = url.replace( me.PARAM_PERIOD_END_DATE, dateRange.endDate );
 
       RESTUtil.retrieveData( url, function( response ){
-        me.loadedCatOptionsListWithDateRange = true;
-        me.afterLoadCatOptionsList( response.categoryOptions );
-      });
-
-    }
-
-    me.retrieveCatOptionsListWithoutDateRange = function()
-    {
-      var ouId = me.orgunitTag.attr("ouId");
-
-      var url =  me.CATOPTION_QUERY_URL + me.CATOPTION_QUERY_FITER_EMPTY_DATE_RANGE;
-      url = url.replace( me.PARAM_ORGUNIT_ID, ouId );
-
-      RESTUtil.retrieveData( url, function( response ){
-        me.loadedCatOptionsListwithutDateRange = true;
         me.afterLoadCatOptionsList( response.categoryOptions );
       });
 
@@ -212,14 +214,16 @@ function ProjectManager()
     me.afterLoadCatOptionsList = function( categoryOptions )
     {
       me.catOptionList = me.catOptionList.concat( categoryOptions );
-
-      if( me.loadedCatOptionsListWithDateRange && me.loadedCatOptionsListwithutDateRange )
+      me.processCatOptions++;
+      if( me.processCatOptions == 4 )
       {
-        me.catOptionList = Util.sortByKey( me.catOptionList, "name" );
         me.loadingMsgTag.html("Populating data to table ...");
-        me.populateTableData( me.catOptionList );
+        me.catOptionList = me.resolveCatOptionList( me.catOptionList );
+       
+        var dataList =  Object.values( me.catOptionList );
+        dataList = Util.sortByKey( dataList, "name" );
+        me.populateTableData( dataList );
 
-        me.catOptionList = me.resolveCatOptionList( me.catOptionList )
         me.showDataTable();
       }
     }
@@ -239,6 +243,26 @@ function ProjectManager()
       }
     }
 
+    me.addOrUpdateDataRowInTable = function( catOptionData )
+    {
+      var rowTag = me.getRowInDataTable(  catOptionData.id );
+      if( me.isValidCatOptionData( catOptionData ) )
+      {
+        if( rowTag ) // The row is existing in table --> Do updating
+        {
+          me.updateDataRow( catOptionData );
+        }
+        else 
+        {
+          me.addNewDataRow( catOptionData ); // The row dosen't exist in table --> Do adding
+        }
+      }
+      else
+      {
+        me.removeDataRow( catOptionData ); // catOptionData with  startDate / endData is invalid --> Remove the row
+      }
+    }
+
     // Add a new row
     me.addNewDataRow = function( catOptionData ){
       var code = ( catOptionData.code ) ? catOptionData.code : "";
@@ -251,14 +275,21 @@ function ProjectManager()
       rowTag.append("<td>" + startDate + "</td>");
       rowTag.append("<td>" + endDate + "</td>");
 
-      var attrValues = catOptionData.attributeValues;
-      if( attrValues )
+      // For Project Type
+      var projectTypeList = me.metaData[ProjectManager.METADTA_TYPE_PROJECT_TYPE].categoryOptionGroups;
+      var hasProjectType = false;
+      for( var i in projectTypeList )
       {
-        var projectTypeAttrValue = Util.findItemFromList( attrValues, ProjectManager.projectTypesAttrId, "id" );
-        var projectType = (projectTypeAttrValue) ? me.getAttrValue( attrValue, ProjectManager.METADTA_TYPE_PROJECT_TYPE ) : "";
-        rowTag.append("<td>" + projectType + "</td>");
+        var projectType = projectTypeList[i];
+        var foundOption = Util.findItemFromList( projectType.categoryOptions, catOptionData.id, "id" );
+        if( foundOption )
+        {
+          rowTag.append("<td>" +  projectType.displayName + "</td>");
+          hasProjectType = true;
+        }
       }
-      else
+      
+      if( !hasProjectType )
       {
         rowTag.append("<td></td>");
       }
@@ -277,7 +308,7 @@ function ProjectManager()
     // Update an existing row
     me.updateDataRow = function( catOptionData )
     {
-      var rowTag = me.catOptionListTbTag.find("tbody tr[catOptId='" + catOptionData.id + "']");
+      var rowTag = me.getRowInDataTable( catOptionData.id );
 
       var startDate = ( catOptionData.startDate ) ? DateUtil.convertToDisplayDate( catOptionData.startDate ) : "";
       var endDate = ( catOptionData.endDate ) ? DateUtil.convertToDisplayDate( catOptionData.endDate ) : "";
@@ -287,15 +318,25 @@ function ProjectManager()
       Util.setTableColumnValue( rowTag, 3, startDate );
       Util.setTableColumnValue( rowTag, 4, endDate );
       
+       // For Project Type
+       var projectTypeList = me.metaData[ProjectManager.METADTA_TYPE_PROJECT_TYPE].categoryOptionGroups;
+       for( var i in projectTypeList )
+       {
+         var projectType = projectTypeList[i];
+         var foundOption = Util.findItemFromList( projectType.categoryOptions, catOptionData.id, "id" );
+         if( foundOption )
+         {
+            Util.setTableColumnValue( rowTag, 5,  projectType.displayName );
+            hasProjectType = true;
+         }
+       }
 
-      var attrValues = catOptionData.attributeValues;
-      if( attrValues )
-      {
-        var projectTypeAttrValue = Util.findItemFromList( attrValues, ProjectManager.projectTypesAttrId, "id" );
-        var projectType = (projectTypeAttrValue) ? me.getAttrValue( attrValue, ProjectManager.METADTA_TYPE_PROJECT_TYPE ) : "";
-        Util.setTableColumnValue( rowTag, 5, projectType );
-      }
+    }
 
+    me.removeDataRow = function( catOptionData )
+    {
+      me.getRowInDataTable( catOptionData.id ).remove();
+      delete me.catOptionList[catOptionData.id];
     }
 
     me.getAttrValue = function( attrValue, metaDataType )
@@ -326,12 +367,27 @@ function ProjectManager()
       });
     }
 
+    me.isValidCatOptionData = function( catOptonData )
+    {
+      var dateRange = me.getPeriodDateRage();
+      if( catOptonData.endDate )
+      {
+        return ( catOptonData.endDate >= dateRange.startDate );
+      }
+      else if( catOptonData.startDate )
+      {
+        return ( catOptonData.startDate >= dateRange.startDate && catOptonData.startDate <= dateRange.endDate );
+      } 
+
+      return ( !catOptonData.startDate && !catOptonData.endDate );
+    }
+
     // ------------------------------------------------------------------------------------------------
     // Supportive methods
 
-    me.getPeriodDateRage = function( period )
+    me.getPeriodDateRage = function()
     {
-      var year = period;
+      var year = me.periodTag.val();
       var startDate = year + "-01-01";
       var endDate = year + "-12-31";
 
@@ -347,7 +403,10 @@ function ProjectManager()
       for( var i in catOptionList )
       {
         var catOpt = catOptionList[i];
-        result[catOpt.id] = catOpt;
+        if( result[catOpt.id] == undefined )
+        {
+          result[catOpt.id] = catOpt;
+        }
       }
 
       return result;
@@ -378,6 +437,11 @@ function ProjectManager()
       me.loadingDivTag.hide();
       me.catOptionListTbTag.hide();
       me.addNewCatOptionBtnTag.hide();
+    }
+
+    me.getRowInDataTable = function( catOptId )
+    {
+      return me.catOptionListTbTag.find("tbody tr[catOptId='" +catOptId + "']");
     }
 
     // ------------------------------------------------------------------------------------------------

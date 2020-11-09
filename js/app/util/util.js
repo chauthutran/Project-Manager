@@ -28,25 +28,29 @@ Util.setTableColumnValue = function( rowTag, colIdx, value )
 	Util.getTableColumnByIdx( rowTag, colIdx).html( value );
 }
 
+// -------------------------------------------------------------------------------------------------------
 /**  For  Array */
 Util.findItemFromList = function( list, value, propertyName )
 {
 	var item;
 
-	// If propertyName being compare to has not been passed, set it as 'id'.
-	if ( propertyName === undefined )
+	if( list )
 	{
-		propertyName = "id";
-	}
-
-	for( i = 0; i < list.length; i++ )
-	{
-		var listItem = list[i];
-
-		if ( listItem[propertyName] == value )
+		// If propertyName being compare to has not been passed, set it as 'id'.
+		if ( propertyName === undefined )
 		{
-			item = listItem;
-			break;
+			propertyName = "id";
+		}
+
+		for( i = 0; i < list.length; i++ )
+		{
+			var listItem = list[i];
+
+			if ( listItem[propertyName] == value )
+			{
+				item = listItem;
+				break;
+			}
 		}
 	}
 
@@ -90,6 +94,34 @@ Util.sortByKey = function( array, key, noCase, order, emptyStringLast ) {
 	});
 };
 
+Util.removeFromArray = function( list, propertyName, value )
+{
+	var index;
+
+	if( list )
+	{
+		$.each( list, function( i, item )
+		{
+			if ( item[ propertyName ] == value ) 
+			{
+				index = i;
+				return false;
+			}
+		});
+	
+		if ( index !== undefined ) 
+		{
+			list.splice( index, 1 );
+		}
+	}
+	
+
+	return index;
+};
+
+
+// -----------------------------------------------------------------------------------------------------------
+// For DIALOG
 
 Util.setupDialogForm = function( title, dialogDivTag, width, height )
 {

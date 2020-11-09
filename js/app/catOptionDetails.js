@@ -7,7 +7,11 @@ function CatOptionDetailsForm( _projectManagerObj  )
     me.metaData;
     me.catOptionData;
 
-	me.CATEGORY_OPTION_URL = RESTUtil. API_BASED_URL + "categoryOptions/";
+	me.PARAM_CATEGORY_OPTION_GROUP_ID = "@PARAM_CATEGORY_OPTION_GROUP_ID";
+	me.PARAM_CATEGORY_OPTION_ID = "@PARAM_CATEGORY_OPTION_ID";
+
+	me.CATEGORY_OPTION_URL = RESTUtil.API_BASED_URL + "categoryOptions/";
+	me.CAT_OPTION_GROUP_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptionGroups/" + me.PARAM_CATEGORY_OPTION_GROUP_ID  + "/categoryOptions/" + me.PARAM_CATEGORY_OPTION_ID;
 
     me.catOptDetailsDivTag = $("#catOptDetailsDiv");
 	me.nameTag =  me.catOptDetailsDivTag.find("#name");
@@ -112,8 +116,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	{
 		// Reset Form
 		me.catOptDetailsDivTag.find("input[type!='radio'],select").val("");
-		me.catOptDetailsDivTag.find("input[type='radio']:first").prop("checked");
-		me.catOptDetailsDivTag.find("input[type='radio']:first").click();
+		me.catOptDetailsDivTag.find("input[type='radio']").prop("checked", false);
 		me.implStategiesTbTag.find("tbody").find("tr").remove();
 		me.targetPopulationsTbTag.find("tbody tr td button").remove();
 	}
@@ -338,9 +341,28 @@ function CatOptionDetailsForm( _projectManagerObj  )
             me.onGoingTag.prop("checked", true);
         }
 
+		me.populateProjectTypeValue();
+
         // Populate attribute values
         me.populateAttrValues( me.catOptionData.attributeValues );
 
+	}
+
+	
+	me.populateProjectTypeValue = function()
+	{
+		var selectedCatOption = me.catOptionData.id;
+		for( var i in me.projectTypeList )
+		{
+			var projectType = me.projectTypeList[i];
+			var foundOption = Util.findItemFromList( projectType.categoryOptions, selectedCatOption, "id" );
+			if( foundOption )
+			{
+				me.projectTypeOptionDivTag.find("input[value='" + projectType.id + "']").prop("checked", true );
+				me.projectTypeTag.val( projectType.displayName );
+				return;
+			}
+		}
 	}
 
     // Populate 
@@ -408,6 +430,8 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	
 	me.saveCatOptionData = function()
 	{
+		MsgManager.appBlock("Saving project ...");
+
 		if( me.catOptionData ) // Update catOption
 		{
 			me.updateCatOptionData();
@@ -427,10 +451,8 @@ function CatOptionDetailsForm( _projectManagerObj  )
 
 			me.disableForm();
             me.projectManagerObj.catOptionList[me.catOptionData.id] = jsonData;
-            me.projectManagerObj.updateDataRow( jsonData );
 
-            me.catOptDetailsDivTag.dialog( "close" );
-            alert("Save data successfully !");
+			me.updateCatOptionInGroup( jsonData );
 
 		}, function( errResponse ){ // actionError
 
@@ -445,14 +467,13 @@ function CatOptionDetailsForm( _projectManagerObj  )
 
 		RESTUtil.submitData( "POST", jsonData, url, function( response ){ // actionSuccess
 
-            me.disableForm();
             var catOptId = response.response.uid;
             jsonData.id = catOptId;
             me.projectManagerObj.catOptionList[catOptId] = jsonData;
-            me.projectManagerObj.addNewDataRow( jsonData );
+			me.projectManagerObj.addNewDataRow( jsonData );
+			
+			me.updateCatOptionInGroup( jsonData );
 
-			me.catOptDetailsDivTag.dialog( "close" );
-            alert("Add new data successfully !");
 
 		}, function( errResponse ){ // actionError
 
@@ -460,6 +481,73 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		});
 	}
 	
+	me.updateCatOptionInGroup = function( catOptionData ){
+		me.processingProjectTypeIdx = 0;
+		var projectTypeTags = me.projectTypeOptionDivTag.find("input");
+		projectTypeTags.each( function(){
+			if( $(this).prop("checked") )
+			{
+				me.saveCatOptionInGroup( "POST", $(this).val(), catOptionData );
+			}
+			else
+			{
+				me.saveCatOptionInGroup( "DELETE", $(this).val(), catOptionData );
+			}
+		});
+		
+	}
+
+	// Save Project Type
+	me.saveCatOptionInGroup = function( requestMethod, groupId, catOptionData )
+	{
+		var url = me.CAT_OPTION_GROUP_QUERY_URL;
+		url = url.replace( me.PARAM_CATEGORY_OPTION_GROUP_ID, groupId );
+		url = url.replace( me.PARAM_CATEGORY_OPTION_ID, catOptionData.id );
+
+		RESTUtil.submitData( requestMethod,{} , url, function(){ // actionSuccess
+
+			var projectTypeCatOptionList = Util.findItemFromList( me.metaData[ProjectManager.METADTA_TYPE_PROJECT_TYPE].categoryOptionGroups, groupId, "id" ).categoryOptions;
+			if( projectTypeCatOptionList == undefined )
+			{
+				projectTypeCatOptionList = [];
+			}
+
+			if( requestMethod == "POST" )
+			{
+				var foundItem = Util.findItemFromList( projectTypeCatOptionList, catOptionData.id, "id" );
+				if( !foundItem )
+				{
+					projectTypeCatOptionList.push( catOptionData );
+				}
+
+			}
+			else if( requestMethod == "DELETE" )
+			{
+				projectTypeCatOptionList = Util.removeFromArray( projectTypeCatOptionList, "id", catOptionData.id );
+			}
+
+
+			// ---------------------------------------------------------------------------------------------------------
+			// Check if all catOptionGroups were added/updated
+
+			me.processingProjectTypeIdx++;
+
+			if( me.processingProjectTypeIdx == me.projectTypeList.length )
+			{
+				me.projectManagerObj.addOrUpdateDataRowInTable( catOptionData );
+
+				MsgManager.appUnblock();
+
+				me.catOptDetailsDivTag.dialog( "close" );
+				alert("Save data successfully !");
+			}
+
+		}, function( error ){ // error
+			
+			MsgManager.appUnblock();
+			alert("Error occured while updating a project type.\n" + error.statusText );
+		});
+	}
 
 	me.saveError = function( errResponse )
 	{
@@ -476,6 +564,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		}
 
 		alert( message );
+		MsgManager.appUnblock();
 	}
 
 	// ----------------------------------------------------------------------------------------------
@@ -767,6 +856,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
         me.saveBtnTag.show();
 	}
 	
+
 	// ----------------------------------------------------------------------------------------------
 	// Run init method
 
