@@ -2,6 +2,8 @@ function ProjectManager()
 {
     var me = this;
 
+    me.backToMainPageTag = $("[name='backToMainPage']");
+
     me.orgunitTag = $("#orgunit");
     me.periodTag = $("#period");
     me.periodTag = $("#period");
@@ -35,24 +37,13 @@ function ProjectManager()
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
     // Filter Query
 
-    // CatOption.startDate >= pe.startDate && CatOption.startDate <= pe.endDate
-    me.CATOPTION_QUERY_FITER_DATE_1 = "&filter=startDate:ge:" + me.PARAM_PERIOD_START_DATE + "&filter=startDate:le:" + me.PARAM_PERIOD_END_DATE;
-    // CatOption.startDate <= pe.endDate && CatOption.endDate is null
-    me.CATOPTION_QUERY_FITER_DATE_2 = "&filter=startDate:le:" + me.PARAM_PERIOD_END_DATE + "&filter=startDate:null";
-    // CatOption.endDate >= pe.startDate
-    me.CATOPTION_QUERY_FITER_DATE_3 = "&filter=endDate:ge:" + me.PARAM_PERIOD_START_DATE;
-    // CatOption.startDate is null & CatOption.endDate is null
-    me.CATOPTION_QUERY_FITER_EMPTY_DATE_RANGE = "&filter=startDate:null&filter=startDate:null";
-
-
     me.loadedOptionSet = false;
     me.loadedProjectTypeList = false;
-    me.loadedCatOptionsListWithDateRange = false;
-    me.loadedCatOptionsListwithutDateRange = false;
 
     me.catOptionDetailsFormObj;
     me.metaData = [];
-    me.catOptionList = [];
+    me.originalList;
+    me.catOptionList;
 
 
     // ------------------------------------------------------------------------------------------------
@@ -69,7 +60,7 @@ function ProjectManager()
 
 
         // Set up DIALOG form for showing / updating / adding a catOption details
-        Util.setupDialogForm( "Project Details", me.catOptDetailsDivTag, 600, 700 );
+        Util.setupDialogForm( "Project Details", me.catOptDetailsDivTag, 600, 700, true );
 
         me.setup_Events();
     }
@@ -99,24 +90,26 @@ function ProjectManager()
             select: function( event, ui ) {
               me.orgunitTag.attr( "ouId", ui.item.id );
               me.orgunitTag.autocomplete( 'close' );
-
-              me.hideDataTablePage();
+              me.resetForm();
             },
             change: function( event, ui ) {
                 if( ui.item == null ) {
                     $( this ).val("");
                     $( this ).focus();
+                   
+                    me.resetForm();
                 }
             }
           } );
     }
+
 
     me.initPeriodList = function()
     {
       var date = new Date();
       var year = eval( date.getFullYear() );
 
-      var startPeriod = year - 10;
+      var startPeriod = year - 20;
       var endPeriod = year + 3;
 
       me.periodTag.append("<option value=''>[Please choose a option]</option>");
@@ -129,21 +122,42 @@ function ProjectManager()
 
     me.setup_Events = function()
     {
+      me.backToMainPageTag.click( function(){
+        window.location.href = "../../..";
+      });
+
       me.periodTag.change( function(){
         me.hideDataTablePage();
       });
 
-
       me.searchBtnTag.click( function(){
         if( ValidationUtil.checkMandatoryValidation( me.paramFormTag ) )
         {
-          me.retrieveCatOptionsList();
+          if( me.originalList )
+          {
+            me.hideDataTable();
+            me.populateTableDataByPeriod( me.originalList );
+            me.showDataTable();
+          }
+          else
+          {
+            me.retrieveCatOptionsList();
+          }
+         
         }
       });
 
       me.addNewCatOptionBtnTag.click(function(){
         me.catOptionDetailsFormObj.showAddDialogForm();
       })
+    }
+
+    me.resetForm = function()
+    {
+      me.originalList = undefined;
+      me.catOptionList = undefined;
+      
+      me.hideDataTablePage();
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -167,6 +181,7 @@ function ProjectManager()
       });
     }
     
+
     me.afterMetadataLoad = function()
     {
       if( me.loadedOptionSet && me.loadedProjectTypeList )
@@ -178,75 +193,109 @@ function ProjectManager()
 
 
     // ------------------------------------------------------------------------------------------------
-    // Retrieve catOption list
-
+    // Retrieve catOption list by Orgunits
 
     me.retrieveCatOptionsList = function()
     {
       me.processCatOptions = 0;
+      me.originalList = [];
       me.catOptionList = [];
 
       me.loadingMsgTag.html("Retrieving data ...");
       me.hideDataTable();
 
-      me.retrieveCatOptionsByQuery( me.CATOPTION_QUERY_FITER_DATE_1 );
-      me.retrieveCatOptionsByQuery( me.CATOPTION_QUERY_FITER_DATE_2 );
-      me.retrieveCatOptionsByQuery( me.CATOPTION_QUERY_FITER_DATE_3 );
-      me.retrieveCatOptionsByQuery( me.CATOPTION_QUERY_FITER_EMPTY_DATE_RANGE );
-    }
-
-    me.retrieveCatOptionsByQuery = function( filterQuery )
-    {
-      var dateRange = me.getPeriodDateRage();
       var ouId = me.orgunitTag.attr("ouId");
-
-      var url =  me.CATOPTION_QUERY_URL + filterQuery;
+      var url =  me.CATOPTION_QUERY_URL;
       url = url.replace( me.PARAM_ORGUNIT_ID, ouId );
-      url = url.replace( me.PARAM_PERIOD_START_DATE, dateRange.startDate );
-      url = url.replace( me.PARAM_PERIOD_END_DATE, dateRange.endDate );
 
       RESTUtil.retrieveData( url, function( response ){
-        me.afterLoadCatOptionsList( response.categoryOptions );
+        me.originalList = response.categoryOptions;
+
+        me.catOptionList = me.resolveCatOptionList( me.originalList );
+
+        me.populateTableDataByPeriod( me.originalList );
+        me.showDataTable();
       });
 
     }
 
-    me.afterLoadCatOptionsList = function( categoryOptions )
-    {
-      me.catOptionList = me.catOptionList.concat( categoryOptions );
-      me.processCatOptions++;
-      if( me.processCatOptions == 4 )
-      {
-        me.loadingMsgTag.html("Populating data to table ...");
-        me.catOptionList = me.resolveCatOptionList( me.catOptionList );
-       
-        var dataList =  Object.values( me.catOptionList );
-        dataList = Util.sortByKey( dataList, "name" );
-        me.populateTableData( dataList );
 
-        me.showDataTable();
+    me.filterCatOptionListByDate = function( categoryOptions )
+    {
+      var validList = [];
+      for( var i in categoryOptions )
+      {
+        var categoryOption = categoryOptions[i];
+        if( categoryOption.id=="AKO3MeLP66A" )
+        {
+          var fasdfdasf= 0 ;
+        }
+        if( me.checkValidCatOptionByPeriod( categoryOption ) )
+        {
+          validList.push( categoryOption );
+        }
       }
+
+      return validList;
+    }
+
+    me.checkValidCatOptionByPeriod = function( categoryOption )
+    {
+      var selectedPeriod = me.periodTag.val();
+
+      // Case #1: if CatOption has startDate and endDate
+      if( categoryOption.startDate && categoryOption.endDate )
+      {
+        var startYear = me.getYearFromDateStr( categoryOption.startDate );
+        var endYear = me.getYearFromDateStr( categoryOption.endDate );
+
+        return ( selectedPeriod >= startYear &&  selectedPeriod <= endYear ) ;
+      }
+      // Case #2: If catOption as startDate ony
+      else if( categoryOption.startDate )
+      {
+        var startYear = me.getYearFromDateStr( categoryOption.startDate );
+        return ( selectedPeriod >= startYear );
+      }
+      // Case #3: If catOption as endDate ony
+      else if( categoryOption.endDate )
+      {
+        var endYear = me.getYearFromDateStr( categoryOption.endDate );
+        return ( selectedPeriod <= endYear ) ;
+      }
+      // Case #4: If catOption is no any date
+      else
+      {
+        return true;
+      }
+    }
+
+    me.getYearFromDateStr = function( dateStr )
+    {
+      return dateStr.split( "-" )[0];
     }
 
     // ------------------------------------------------------------------------------------------------
     // Populate data in table / in dialog , set up events for rows in data table
 
     // Populate data
-    me.populateTableData = function( catOptionList )
+    me.populateTableDataByPeriod = function( catOptionList )
     {
+      var validCatOptionList = me.filterCatOptionListByDate( catOptionList );
+
       var tbody = me.catOptionListTbTag.find("tbody");
       tbody.find("tr").remove();
 
-      for( var i in catOptionList )
+      for( var i in validCatOptionList )
       {
-        me.addNewDataRow( catOptionList[i] );
+        me.addNewDataRow( validCatOptionList[i] );
       }
     }
 
     me.addOrUpdateDataRowInTable = function( catOptionData )
     {
       var rowTag = me.getRowInDataTable(  catOptionData.id );
-      if( me.isValidCatOptionData( catOptionData ) )
+      if( me.checkValidCatOptionByPeriod( catOptionData ) )
       {
         if( rowTag ) // The row is existing in table --> Do updating
         {
@@ -363,39 +412,13 @@ function ProjectManager()
     {
       rowTag.click( function(){
         var catOptId = rowTag.attr("catOptId");
+        me.fasdfsdfasdffd
         me.catOptionDetailsFormObj.showUpdateDialogForm( catOptId );
       });
     }
 
-    me.isValidCatOptionData = function( catOptonData )
-    {
-      var dateRange = me.getPeriodDateRage();
-      if( catOptonData.endDate )
-      {
-        return ( catOptonData.endDate >= dateRange.startDate );
-      }
-      else if( catOptonData.startDate )
-      {
-        return ( catOptonData.startDate >= dateRange.startDate && catOptonData.startDate <= dateRange.endDate );
-      } 
-
-      return ( !catOptonData.startDate && !catOptonData.endDate );
-    }
-
     // ------------------------------------------------------------------------------------------------
     // Supportive methods
-
-    me.getPeriodDateRage = function()
-    {
-      var year = me.periodTag.val();
-      var startDate = year + "-01-01";
-      var endDate = year + "-12-31";
-
-      return {
-        "startDate" : startDate,
-        "endDate" : endDate
-      }
-    }
 
     me.resolveCatOptionList = function( catOptionList )
     {

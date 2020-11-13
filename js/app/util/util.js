@@ -123,13 +123,81 @@ Util.removeFromArray = function( list, propertyName, value )
 // -----------------------------------------------------------------------------------------------------------
 // For DIALOG
 
-Util.setupDialogForm = function( title, dialogDivTag, width, height )
+Util.setupDialogForm = function( title, dialogDivTag, width, height, fullScreen )
 {
-	dialogDivTag.dialog({
-		title: title
-		,autoOpen: false
-		,width: width
-		,height: height
-		,modal: true
-	});
+	if( fullScreen )
+	{
+		dialogDivTag.dialog({
+			title: title
+			,autoOpen: false
+			,width: $(window).width()
+			,height: $(window).height() - 45
+			,modal: true
+			,close: function( event, ui ) {
+				Util.closeDialog( dialogDivTag );
+			}
+		});
+
+
+		dialogDivTag.closest('.ui-dialog').css({
+				'width': $(window).width(),
+				'height': $(window).height() - 45,
+				'left': '0px',
+				'top':'50px',
+				'position': 'fixed'
+		});
+		
+
+		$(window).resize(function () {
+			dialogDivTag.closest('.ui-dialog').css({
+					'width': $(window).width(),
+					'height': $(window).height() - 45,
+					'left': '0px',
+					'top':'50px',
+					'position': 'fixed'
+			});
+		}).resize();
+
+	}
+	else
+	{
+		dialogDivTag.dialog({
+			title: title
+			,autoOpen: false
+			,width: width
+			,height: height
+			,modal: true
+			// ,dialogClass:"dialog-full-mode"
+			,close: function( event, ui ) {
+				Util.closeDialog( dialogDivTag );
+			}
+		});
+	}
+
+
+	
 }
+
+Util.openDialog = function( dialogDivTag, fullScreen )
+{
+	dialogDivTag.dialog( "open" );
+	$("body").css( "overflow", "hidden" );
+
+	if( fullScreen )
+	{
+		dialogDivTag.closest('.ui-dialog').css({
+			'width': $(window).width(),
+			'height': $(window).height() - 45,
+			'left': '0px',
+			'top':'50px'
+		});
+	}
+}
+
+Util.closeDialog = function( dialogDivTag )
+{
+	dialogDivTag.dialog( "close" );
+	$("body").css( "overflow", "auto" );
+}
+
+

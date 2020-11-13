@@ -4,17 +4,18 @@
 <title>WHR - Project Manager</title>
 <meta charset="UTF-8">
 
+  
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="js/jQuery/jquery.blockUI.js"></script>
-
-  
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <!-- <link type="text/css" rel="stylesheet" media="screen" href="../dhis-web-commons/javascripts/jQuery/ui/css/redmond/jquery-ui.css">
 <link type="text/css" rel="stylesheet" media="screen" href="../dhis-web-commons/javascripts/jQuery/calendars/css/jquery.calendars.picker.css">
@@ -47,18 +48,18 @@
 	<!--- Header -->
 	<div class="header">
 		<div class="title">
-			<a href="" style="min-width: 175px;" name="backToPage">
+			<a href="" style="min-width: 175px;" name="backToMainPage">
 				<img src="../../staticContent/logo_banner" name="dhisHeaderText">
 			</a>
 		</div>
 		
 		<div class="title">	
-			<a name="backToPage" href="../../../dhis-web-commons-about/redirect.action" name="dhisHeaderText">WHR Dev Service Statistics</a>
+			<a name="backToMainPage" href="../../../dhis-web-commons-about/redirect.action" name="dhisHeaderText">WHR Dev Service Statistics</a>
 		</div>
 		
 		<div class="header-right">
-			<a href="#" target="_blank" style="color: White;font-weight:normal;font-size:11px;" title="App version number (Click for version detail page)">v <span id="currentVersion">0.1</span></a>
-				| <button name="backToPage"><span title="Close this app and go back to home page.">Close</span></button>
+			<a href="https://docs.google.com/document/d/1VZzJlsL7IrEw6LzkIy-G0aJqz8VR2MZJH_u32ojarPE/edit#" target="_blank" style="color: White;font-weight:normal;font-size:11px;" title="App version number (Click for version detail page)">v <span id="currentVersion">1.0</span></a>
+				| <button name="backToMainPage"><span title="Close this app and go back to home page.">Close</span></button>
 		</div>
 		
 	</div>
@@ -112,7 +113,7 @@
 		</table>
 
 		<!-- Add button -->
-		<div style="width:100%;text-align:right;padding-top: 10px;">
+		<div style="width:100%;text-align:right;padding-top: 10px;padding-bottom: 20px;">
 			<!-- span id="totalProjectNo" style="font-style: italic;font-weight: bold;"></span><br> -->
 			<button class="btn btn-primary" id="addNewCatOptionBtn" style="margin-top: 10px;display:none;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt:vI9siTdorSG"> ADD NEW PROJECT</span></button>
 		</div>
@@ -134,7 +135,7 @@
 					<td colspan="5"><label keyword="opt:sMlGJGkzB9v">Project Name</label></td>
 				</tr>
 				<tr>
-					<td colspan="5"><input type="text" id="name" maxlength="100"></td>
+					<td colspan="5"><span style="font-style: italic;">PRJ - </span><input type="text" id="name" maxlength="100" style="width:90%;"></td>
 				</tr>
 				
 				
@@ -159,12 +160,12 @@
 					<td><label>Flag 3</label></td> -->
 				</tr>
 				
-				<!-- <tr>
+				<tr>
 					<td colspan="2">
 						<input type="text" id="projectType" disabled mandatory="true">
 						<div id="projectTypeOptionDiv" style="width:100%;display:none;"></div>
 					</td>
-					<td>
+					<!-- <td>
 						<img src="img/statusFail.png">
 					</td>
 					<td>
@@ -172,8 +173,8 @@
 					</td>
 					<td>
 						<img src="img/statusWarning.png">
-					</td>
-				</tr> -->
+					</td>  -->
+				</tr>
 				
 			</tbody>
 
@@ -261,7 +262,7 @@
 
 		<hr style="border-top: 1px solid black;">
 
-		<div style="width:100%;text-align:right">
+		<div style="width:100%;text-align:right;margin-bottom: 50px;">
 			<button class="btn btn-warning" id="cancelBtn" style="margin-top: 10px;display:none">CANCEL</button>
 			<button class="btn btn-primary" id="editBtn" style="margin-top: 10px;">EDIT</button>
 			<button class="btn btn-primary" id="saveBtn" style="margin-top: 10px;display:none">SAVE</button>

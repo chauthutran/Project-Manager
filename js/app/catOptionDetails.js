@@ -7,6 +7,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
     me.metaData;
     me.catOptionData;
 
+	me.PROJECT_NAME_PREFIX = "PRJ - ";
 	me.PARAM_CATEGORY_OPTION_GROUP_ID = "@PARAM_CATEGORY_OPTION_GROUP_ID";
 	me.PARAM_CATEGORY_OPTION_ID = "@PARAM_CATEGORY_OPTION_ID";
 
@@ -53,6 +54,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	me.implStategiesAttrId = "kKB7KCMbSxR";
 	me.targetPopulationsAttrId = "JEjwUg7H3Vs";
 
+
 	me.catOptionData;
 	me.implStategiesList;
 	me.targetPopulationsList;
@@ -85,11 +87,14 @@ function CatOptionDetailsForm( _projectManagerObj  )
         me.disableForm();
 
         // Open FROM as dialog
-        me.catOptDetailsDivTag.dialog( "open" );
+		Util.openDialog( me.catOptDetailsDivTag, true );
+		// $(".fullscreen-btn").closest("button").click();  // Make full screen as soon as the form is opened
+		
+		// me.catOptDetailsDivTag.closest(".ui-dialog").css( "top", 45 );
 	}
 
 	
-	me.showAddDialogForm = function( catOptId )
+	me.showAddDialogForm = function( )
 	{
 		me.resetForm();
 
@@ -99,7 +104,10 @@ function CatOptionDetailsForm( _projectManagerObj  )
         me.enableForm();
 
         // Open FROM as dialog
-        me.catOptDetailsDivTag.dialog( "open" );
+		Util.openDialog( me.catOptDetailsDivTag, true );
+		// $(".fullscreen-btn").closest("button").click();  // Make full screen as soon as the form is opened
+		
+		// me.catOptDetailsDivTag.closest(".ui-dialog").css( "top", 45 );
 	}
 
 	// ----------------------------------------------------------------------------------------------
@@ -157,7 +165,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		});
 
         me.cancelBtnTag.click(function(){
-			me.catOptDetailsDivTag.dialog( "close" );
+			Util.closeDialog( me.catOptDetailsDivTag );
         })
 
 		// OnGoing checkbox
@@ -190,7 +198,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			me.impStrategiesDialog_CheckToHideGroupOptions();
 
 			// Close Dialog
-			me.searchImplStrategiesDialogDivTag.dialog( "open" );
+			Util.openDialog( me.searchImplStrategiesDialogDivTag );
 		});
 
 		me.implStrategiesGroupTag.change( function(){
@@ -226,12 +234,11 @@ function CatOptionDetailsForm( _projectManagerObj  )
 					me.implStrategiesGroupTag.find("option[value='" + groupCode + "']").hide();
 				}
 			}
-
-			me.searchImplStrategiesDialogDivTag.dialog( "close" );
+			Util.closeDialog( me.searchImplStrategiesDialogDivTag );
 		});
 
 		me.closeImplStrategiesBtnTag.click( function(){
-			me.searchImplStrategiesDialogDivTag.dialog( "close" );
+			Util.closeDialog( me.searchImplStrategiesDialogDivTag );
 		});
 
 	}
@@ -249,7 +256,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			me.targetPopulationsDialog_HideSelectedOption();
 
 			// Open Dialog
-			me.searchTargetPopulationsDialogDivTag.dialog( "open" );
+			Util.openDialog( me.searchTargetPopulationsDialogDivTag );
 		});
 
 		me.addTargetPopulationsBtnTag.click( function(){
@@ -266,15 +273,14 @@ function CatOptionDetailsForm( _projectManagerObj  )
 				me.targetPopulationsOOptionTag.find("option[value='" + optionData.code + "']").hide();
 			}
 
-			me.searchTargetPopulationsDialogDivTag.dialog( "close" );
+			Util.closeDialog( me.searchTargetPopulationsDialogDivTag );
 		});
 
 		me.closeTargetPopulationsBtnTag.click( function(){
-			me.searchTargetPopulationsDialogDivTag.dialog( "close" );
+			Util.closeDialog( me.searchTargetPopulationsDialogDivTag );
 		});
 
 	}
-
 
 	// ----------------------------------------------------------------------------------------------
     // Set up DIALOG forms for Implementation Strategies and Target Populations
@@ -283,11 +289,11 @@ function CatOptionDetailsForm( _projectManagerObj  )
     {
         // Populate data for impStrategiesDialog
         me.impStrategiesDialog_PopulateCheckBoxes(  me.metaData[ProjectManager.METADTA_TYPE_OPTIONSET] );
-        Util.setupDialogForm( "Implement Strategies", me.searchImplStrategiesDialogDivTag, 500, 410 );
+        Util.setupDialogForm( "Implement Strategies", me.searchImplStrategiesDialogDivTag, 500, 410, false );
         
         // Populate data for targetPopulationsDialog
         me.targetPopulationsDialog_PopulateCheckboxes( me.metaData[ProjectManager.METADTA_TYPE_OPTIONSET] );
-        Util.setupDialogForm( "Target Populations", me.searchTargetPopulationsDialogDivTag, 350, 320 );
+        Util.setupDialogForm( "Target Populations", me.searchTargetPopulationsDialogDivTag, 350, 320, false );
     }
 
 	// ----------------------------------------------------------------------------------------------
@@ -320,7 +326,8 @@ function CatOptionDetailsForm( _projectManagerObj  )
     // Populate data for "Project Details" part
 	me.populateCatOptionDetails = function()
 	{
-        me.nameTag.val( me.catOptionData.name );
+		var name = me.resolveCatOptionNameToDisplay( me.catOptionData.name );
+        me.nameTag.val( name );
         me.shortNameTag.val( me.catOptionData.shortName );
         me.codeTag.val( me.catOptionData.code );
 
@@ -347,7 +354,6 @@ function CatOptionDetailsForm( _projectManagerObj  )
         me.populateAttrValues( me.catOptionData.attributeValues );
 
 	}
-
 	
 	me.populateProjectTypeValue = function()
 	{
@@ -537,8 +543,8 @@ function CatOptionDetailsForm( _projectManagerObj  )
 				me.projectManagerObj.addOrUpdateDataRowInTable( catOptionData );
 
 				MsgManager.appUnblock();
+				Util.closeDialog( me.catOptDetailsDivTag );
 
-				me.catOptDetailsDivTag.dialog( "close" );
 				alert("Save data successfully !");
 			}
 
@@ -691,7 +697,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			jsonData.organisationUnits.push( {"id" : me.projectManagerObj.orgunitTag.attr("ouId")});
 		}
 		
-		jsonData.name = me.nameTag.val();
+		jsonData.name = me.resolveCatOptionNameToSaving( me.nameTag.val() );
 		jsonData.shortName = me.shortNameTag.val();
 		jsonData.code = me.codeTag.val();
 
@@ -749,18 +755,19 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			jsonData.attributeValues.push( attrValue );
 		}	
 
-
-		// // -----------------------------------------------------------------------------------------------------
-		// // Get ProjectType
-		// if( me.projectTypeTag.val() != "" )
-		// {
-		// 	var attrValue = { "attribute": { "id" : me.projectTypesAttrId }, "value" : me.projectTypeOptionDivTag.find("radio:checked").val() };
-		// 	jsonData.attributeValues.push( attrValue );
-		// }
-
-
 		return jsonData;
 
+	}
+
+	
+	me.resolveCatOptionNameToDisplay = function( name )
+	{
+		return name.replace( me.PROJECT_NAME_PREFIX, "" );
+	}
+
+	me.resolveCatOptionNameToSaving = function( name )
+	{
+		return me.PROJECT_NAME_PREFIX + name;
 	}
 
 	me.createOptionBtn = function( table, optionData, isAddRow )
@@ -805,7 +812,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	{
 		var divTag = $("<div class='option radio'></div>");
 
-		var inputTag = $("<input type='radio' value='" + optionData.id + "'  id='" + optionData.id + "' name='" + radioOptName + "'> ");
+		var inputTag = $("<input type='radio' value='" + optionData.id + "'  id='" + optionData.id + "' name='" + radioOptName + "' style='margin-left: 0px;'> ");
     	var labelTag = $("<label style='color: black;' for='" + optionData.id + "'>" + optionData.displayName + "</label>" );
 		
 		divTag.append( inputTag );
