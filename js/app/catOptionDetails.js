@@ -11,6 +11,8 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	me.PARAM_CATEGORY_OPTION_GROUP_ID = "@PARAM_CATEGORY_OPTION_GROUP_ID";
 	me.PARAM_CATEGORY_OPTION_ID = "@PARAM_CATEGORY_OPTION_ID";
 
+	me.CATEGORY_OPTION_UPDATE_URL = RESTUtil.API_BASED_URL + "categories/OPZj38sNHhm/categoryOptions/" + me.PARAM_CATEGORY_OPTION_ID;
+
 	me.CATEGORY_OPTION_URL = RESTUtil.API_BASED_URL + "categoryOptions/";
 	me.CAT_OPTION_GROUP_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptionGroups/" + me.PARAM_CATEGORY_OPTION_GROUP_ID  + "/categoryOptions/" + me.PARAM_CATEGORY_OPTION_ID;
 
@@ -46,11 +48,9 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	me.addTargetPopulationsBtnTag =  me.catOptDetailsDivTag.find("#addTargetPopulationsBtn");
 	me.closeTargetPopulationsBtnTag =  me.catOptDetailsDivTag.find("#closeTargetPopulationsBtn");
 
-
 	me.implStrategiesOptSetId = "SU52yMajLXm";
 	me.targetPopulationsOptSetId = "e3RJ6M8qB1h";
 
-	me.projectTypesAttrId = "xxx";
 	me.implStategiesAttrId = "kKB7KCMbSxR";
 	me.targetPopulationsAttrId = "JEjwUg7H3Vs";
 
@@ -389,10 +389,6 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			{
 				me.populateAttrValues_TargetPopulations( valueList );
 			}
-			else if( attrId == me.projectTypesAttrId )
-			{
-				me.populateAttrValues_ProjectType( value )
-			}
 		}
 	}
 
@@ -413,22 +409,6 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			me.createOptionBtn( me.targetPopulationsTbTag , optionData, false );
 		}
 	}
-
-	me.populateAttrValues_ProjectType = function( value )
-	{
-		var catOptionData = Util.findItemFromList( me.projectTypeList, value, "id" );
-		me.projectTypeOptionDivTag.find("input").prop("checked", false );
-
-		if( catOptionData )
-		{
-			me.projectTypeTag.val( catOptionData.displayName );
-			me.projectTypeOptionDivTag.find("input[value='" + value + "']").prop("checked", true );
-		}
-		else
-		{
-			me.projectTypeTag.val("");
-		}
-	}
 	
 
 	// ----------------------------------------------------------------------------------------------
@@ -440,14 +420,18 @@ function CatOptionDetailsForm( _projectManagerObj  )
 
 		if( me.catOptionData ) // Update catOption
 		{
+			me.savingProcessTotal =  me.projectTypeList.length;
 			me.updateCatOptionData();
 		}
 		else
 		{
+			// Add / delete the catOption in CatOptionGroups ( me.projectTypeList ), +1 for adding the new project in "CatOption Project"
+			me.savingProcessTotal =  me.projectTypeList.length + 1 ; 
 			me.addCatOptionData();
 		}
 	}
-
+	
+	// Update an existing catOption
 	me.updateCatOptionData = function()
 	{
 		var jsonData = me.generateJsonData();
@@ -465,7 +449,8 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			me.saveError( errResponse );
 		});
     }
-    
+	
+	// Add new a catOption
     me.addCatOptionData = function()
 	{
 		var jsonData = me.generateJsonData();
@@ -479,6 +464,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			me.projectManagerObj.addNewDataRow( jsonData );
 			
 			me.updateCatOptionInGroup( jsonData );
+			me.addCatOptionToCategoryProject( jsonData );
 
 
 		}, function( errResponse ){ // actionError
@@ -487,8 +473,26 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		});
 	}
 	
+	// Add CatOption in category "ABR - Projects [A-C]"
+	me.addCatOptionToCategoryProject = function( catOptionData )
+	{
+		var url = me.CATEGORY_OPTION_UPDATE_URL;
+		url = url.replace( me.PARAM_CATEGORY_OPTION_ID, catOptionData.id );
+
+		RESTUtil.submitData( "POST",{} , url, function(){ // actionSuccess
+
+			me.checkSavingStatus( catOptionData );
+
+		}, function( error ){ // error
+			me.saveError( errResponse );
+			// MsgManager.appUnblock();
+			// alert("Error occured while updating a project type.\n" + error.statusText );
+		});
+	}
+
+	// Add/Delete the ProjectType of catOption by ProjectType list
 	me.updateCatOptionInGroup = function( catOptionData ){
-		me.processingProjectTypeIdx = 0;
+		me.savingProcessIdx = 0;
 		var projectTypeTags = me.projectTypeOptionDivTag.find("input");
 		projectTypeTags.each( function(){
 			if( $(this).prop("checked") )
@@ -503,7 +507,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		
 	}
 
-	// Save Project Type
+	// Add/Update Project Type with one ProgramType
 	me.saveCatOptionInGroup = function( requestMethod, groupId, catOptionData )
 	{
 		var url = me.CAT_OPTION_GROUP_QUERY_URL;
@@ -532,21 +536,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 				projectTypeCatOptionList = Util.removeFromArray( projectTypeCatOptionList, "id", catOptionData.id );
 			}
 
-
-			// ---------------------------------------------------------------------------------------------------------
-			// Check if all catOptionGroups were added/updated
-
-			me.processingProjectTypeIdx++;
-
-			if( me.processingProjectTypeIdx == me.projectTypeList.length )
-			{
-				me.projectManagerObj.addOrUpdateDataRowInTable( catOptionData );
-
-				MsgManager.appUnblock();
-				Util.closeDialog( me.catOptDetailsDivTag );
-
-				alert("Save data successfully !");
-			}
+			me.checkSavingStatus( catOptionData );
 
 		}, function( error ){ // error
 			
@@ -555,11 +545,29 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		});
 	}
 
+	me.checkSavingStatus = function( catOptionData )
+	{
+		// ---------------------------------------------------------------------------------------------------------
+		// Check if all catOptionGroups were added/updated
+
+		me.savingProcessIdx++;
+
+		if( me.savingProcessIdx == me.savingProcessTotal )
+		{
+			me.projectManagerObj.addOrUpdateDataRowInTable( catOptionData );
+
+			MsgManager.appUnblock();
+			Util.closeDialog( me.catOptDetailsDivTag );
+
+			alert("Save data successfully !");
+		}
+	}
+
 	me.saveError = function( errResponse )
 	{
 		var message = "There are some issue while saving data.";
 
-		var errorReports = errResponse.response.errorReports;
+		var errorReports = errResponse.responseJSON.response.errorReports;
 		if( errorReports.length > 0 )
 		{
 			for( var i in errorReports )
@@ -722,9 +730,6 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		}
 
 		
-
-
-
 		// Get data for Implement and TargerPopulations
         jsonData.attributeValues = [];
         

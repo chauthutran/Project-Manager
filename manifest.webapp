@@ -1,7 +1,7 @@
 {
-	"version":"1.0"
-	,"name":"Project Manager"
-	,"description":"Project Manager"
+	"version":"1.1"
+	,"name":"Project Manager DEV"
+	,"description":"Project Manager DEV"
 	,"icons":{"16":null,"48":"img/icons/icon.png","128":null}
 	,"developer":{"url":"","name":"Tran Chau","company":null,"email":null}
 	,"launch_path":"index.html"
