@@ -12,6 +12,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	me.PARAM_CATEGORY_OPTION_ID = "@PARAM_CATEGORY_OPTION_ID";
 
 	me.CATEGORY_OPTION_UPDATE_URL = RESTUtil.API_BASED_URL + "categories/OPZj38sNHhm/categoryOptions/" + me.PARAM_CATEGORY_OPTION_ID;
+	me.CATEGORY_OPTION_COMBO_UPDATE_URL = RESTUtil.API_BASED_URL + "maintenance/categoryOptionComboUpdate";
 
 	me.CATEGORY_OPTION_URL = RESTUtil.API_BASED_URL + "categoryOptions/";
 	me.CAT_OPTION_GROUP_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptionGroups/" + me.PARAM_CATEGORY_OPTION_GROUP_ID  + "/categoryOptions/" + me.PARAM_CATEGORY_OPTION_ID;
@@ -144,6 +145,10 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	{
 		// Set date picker for DATE fields
 		DateUtil.setDateRageFields( me.startDateTag, me.endDateTag );
+
+		me.catOptDetailsDivTag.find("button.delete-date-icon").click(function(){
+			$(this).closest("td").find("input").val("");
+		})
 
 		// Edit form button
 		me.editBtnTag.click( function(){
@@ -412,8 +417,9 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	
 
 	// ----------------------------------------------------------------------------------------------
-	// For saving data
+	// For Add/Update catOption data
 	
+	// Add/Update an catOption
 	me.saveCatOptionData = function()
 	{
 		MsgManager.appBlock("Saving project ...");
@@ -580,6 +586,22 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		alert( message );
 		MsgManager.appUnblock();
 	}
+
+	// me.updateCatOptionCombinations = function()
+	// {
+
+	// 	var url = me.CATEGORY_OPTION_COMBO_UPDATE_URL;
+
+	// 	RESTUtil.submitData( "PUT",{} , url, function(){ // actionSuccess
+
+	// 		alert( "Update category option combos successfully.")
+
+	// 	}, function( error ){ // error
+			
+	// 		MsgManager.appUnblock();
+	// 		alert("Error occured while updating catOptionCombos.\n" + error.statusText );
+	// 	});
+	// }
 
 	// ----------------------------------------------------------------------------------------------
 	// For impStrategiesDialog

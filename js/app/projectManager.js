@@ -3,6 +3,7 @@ function ProjectManager()
     var me = this;
 
     me.backToMainPageTag = $("[name='backToMainPage']");
+    me.updateCatOptionComboBtnTag = $("#updateCatOptionComboBtn");
 
     me.orgunitTag = $("#orgunit");
     me.periodTag = $("#period");
@@ -25,12 +26,14 @@ function ProjectManager()
     me.optionSet_ImplementationStrategies = "SU52yMajLXm";
     me.optionSet_TargetPopulations = "e3RJ6M8qB1h";
 
+    me.CATEGORY_OPTION_COMBO_UPDATE_URL = RESTUtil.API_BASED_URL + "maintenance/categoryOptionComboUpdate";
+
     me.ORGUNIT_QUERY_URL = RESTUtil.API_BASED_URL + "organisationUnits.json?level=5&fields=name,id&paging=false&filter=name:ilike:";
     me.OPTION_SET_QUERY_URL = RESTUtil.API_BASED_URL + "optionSets.json?filter=id:in:[" + me.optionSet_ImplementationStrategies + "," + me.optionSet_TargetPopulations + "]" 
                         + "&fields=id,displayName,options[id,code,displayName]&paging=false";
     me.PROJECT_TYPE_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptionGroupSets/sLnFBYhOlKG.json?fields=id,categoryOptionGroups[id,displayName,categoryOptions[id,name]]";
     me.CATOPTION_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptions.json?fields=*&paging=false"
-                        + "&filter=name:ilike:prj"
+                        + "&filter=categories.id:in:[OPZj38sNHhm]"
                         + "&filter=organisationUnits.id:eq:" +  me.PARAM_ORGUNIT_ID;
     
 
@@ -126,6 +129,11 @@ function ProjectManager()
         window.location.href = "../../..";
       });
 
+      me.updateCatOptionComboBtnTag.click( function()
+      {
+        me.updateCatOptionCombinations();
+      });
+      
       me.periodTag.change( function(){
         me.hideDataTablePage();
       });
@@ -133,17 +141,7 @@ function ProjectManager()
       me.searchBtnTag.click( function(){
         if( ValidationUtil.checkMandatoryValidation( me.paramFormTag ) )
         {
-          if( me.originalList )
-          {
-            me.hideDataTable();
-            me.populateTableDataByPeriod( me.originalList );
-            me.showDataTable();
-          }
-          else
-          {
-            me.retrieveCatOptionsList();
-          }
-         
+          me.retrieveCatOptionsList();
         }
       });
 
@@ -189,6 +187,27 @@ function ProjectManager()
         me.catOptionDetailsFormObj = new CatOptionDetailsForm( me );
         MsgManager.appUnblock();
       }
+    }
+
+
+    // ------------------------------------------------------------------------------------------------
+    // Update catOptionCombo
+  
+
+    me.updateCatOptionCombinations = function()
+    {
+      MsgManager.appBlock("Updating category option combos ... ");
+      var url = me.CATEGORY_OPTION_COMBO_UPDATE_URL;
+
+      RESTUtil.submitData( "PUT",{} , url, function(){ // actionSuccess
+
+        alert( "Updated category option combos.")
+
+      }, function( error ){ // error
+        
+        MsgManager.appUnblock();
+        alert("Error occured while updating catOptionCombos.\n" + error.statusText );
+      });
     }
 
 

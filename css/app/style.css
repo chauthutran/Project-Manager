@@ -311,6 +311,12 @@ h3
  }
 
 
+.delete-date-icon{
+	background-color: white;
+	border: 0px;
+	margin-left: -15px;
+}
+
 
 /*----------------------------------------------------------------------------*/
 /* For validation */

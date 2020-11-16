@@ -79,7 +79,10 @@
 				<tr>
 					<td><input id="orgunit" placeholder="Enter to search" mandatory="true"></td>
 					<td><select id="period" mandatory="true"></select></td>
-					<td><button class="btn btn-primary" id="searchBtn">SEARCH</button></td>
+					<td>
+						<button class="btn btn-primary" id="searchBtn">Search</button>
+						<button class="btn btn-warning" id="updateCatOptionComboBtn">Update Cat Option Combos</button>
+					</td>
 				</tr>
 			</table>
 		   
@@ -115,13 +118,14 @@
 		<!-- Add button -->
 		<div style="width:100%;text-align:right;padding-top: 10px;padding-bottom: 20px;">
 			<!-- span id="totalProjectNo" style="font-style: italic;font-weight: bold;"></span><br> -->
-			<button class="btn btn-primary" id="addNewCatOptionBtn" style="margin-top: 10px;display:none;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt:vI9siTdorSG"> ADD NEW PROJECT</span></button>
+			<button class="btn btn-primary" id="addNewCatOptionBtn" style="margin-top: 10px;display:none;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt:vI9siTdorSG"> Add New Project</span></button>
 		</div>
 	</div>
 
 	<!-- DIALOG for editing/adding a catOption -->
 	
 	<div id="catOptDetailsDiv" style="display:none;">
+		
 		
 		<table class="catOption-details">
 			<!-- <thead>
@@ -149,8 +153,13 @@
 				<tr>
 					<td><input type="text" id="shortName" maxlength="30"></td>
 					<td><input type="text" id="code" maxlength="30"></td>
-					<td><input type="text" id="startDate" style="width:80%;" readonly></td>
-					<td><input type="text" id="endDate" style="width:80%;" readonly></td>
+					<td>
+						<input type="text" id="startDate" style="width:80%;" readonly>
+						<button class="delete-date-icon">x</button>
+					</td>
+					<td><input type="text" id="endDate" style="width:80%;" readonly>
+						<button class="delete-date-icon">x</button>
+					</td>
 					<td><input type="checkbox" id="onGoing"> <label for="onGoing" keyword="opt:e2vH7dQUXJ1">On Going</label></td>
 				</tr>
 				<tr class="title">
@@ -213,8 +222,8 @@
 			</div>
 			<div class="form-group" id="implStrategiesOOption" style="height:250px;overflow-y:auto;border:1px solid #dcd8d8"></div>
 
-			<button class="btn btn-primary" id="addImplStrategiesBtn" keyword="opt:KqY9dEjWhSe">SUBMIT</button>
-			<button class="btn btn-default" id="closeImplStrategiesBtn" keyword="opt:D0aws2oDGCl">CANCEL</button>
+			<button class="btn btn-primary" id="addImplStrategiesBtn" keyword="opt:KqY9dEjWhSe">Submit</button>
+			<button class="btn btn-default" id="closeImplStrategiesBtn" keyword="opt:D0aws2oDGCl">Cancel</button>
 
 		</div>
 	
@@ -263,9 +272,9 @@
 		<hr style="border-top: 1px solid black;">
 
 		<div style="width:100%;text-align:right;margin-bottom: 50px;">
-			<button class="btn btn-warning" id="cancelBtn" style="margin-top: 10px;display:none">CANCEL</button>
-			<button class="btn btn-primary" id="editBtn" style="margin-top: 10px;">EDIT</button>
-			<button class="btn btn-primary" id="saveBtn" style="margin-top: 10px;display:none">SAVE</button>
+			<button class="btn btn-warning" id="cancelBtn" style="margin-top: 10px;display:none">Cancel</button>
+			<button class="btn btn-primary" id="editBtn" style="margin-top: 10px;">Edit</button>
+			<button class="btn btn-primary" id="saveBtn" style="margin-top: 10px;display:none">Save</button>
 		</div>
 
 	</div>
