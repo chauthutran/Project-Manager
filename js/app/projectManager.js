@@ -12,7 +12,7 @@ function ProjectManager()
     me.paramFormTag = $("div.param-area");
 
     me.addNewCatOptionBtnTag = $("#addNewCatOptionBtn");
-;
+
     me.loadingDivTag = $("#loadingDiv");
     me.loadingMsgTag = $("#loadingMsg");
     me.catOptionListTbTag = $("#catOptionListTb");
@@ -25,8 +25,11 @@ function ProjectManager()
 
     me.optionSet_ImplementationStrategies = "SU52yMajLXm";
     me.optionSet_TargetPopulations = "e3RJ6M8qB1h";
+    
 
-    me.CATEGORY_OPTION_COMBO_UPDATE_URL = RESTUtil.API_BASED_URL + "maintenance/categoryOptionComboUpdate";
+    // me.CATEGORY_OPTION_COMBO_UPDATE_URL = RESTUtil.API_BASED_URL + "maintenance/categoryOptionComboUpdate";
+    me.CATEGORY_OPTION_COMBO_UPDATE_URL = RESTUtil.API_BASED_URL + "maintenance/categoryOptionComboUpdate/categoryCombo/W5CScc58WXV";
+
 
     me.ORGUNIT_QUERY_URL = RESTUtil.API_BASED_URL + "organisationUnits.json?level=5&fields=name,id&paging=false&filter=name:ilike:";
     me.OPTION_SET_QUERY_URL = RESTUtil.API_BASED_URL + "optionSets.json?filter=id:in:[" + me.optionSet_ImplementationStrategies + "," + me.optionSet_TargetPopulations + "]" 
@@ -206,7 +209,7 @@ function ProjectManager()
       }, function( error ){ // error
         
         MsgManager.appUnblock();
-        alert("Error occured while updating catOptionCombos.\n" + error.statusText );
+        //alert("Error occured while updating catOptionCombos.\n" + error.statusText );
       });
     }
 

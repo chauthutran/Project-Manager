@@ -12,7 +12,7 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	me.PARAM_CATEGORY_OPTION_ID = "@PARAM_CATEGORY_OPTION_ID";
 
 	me.CATEGORY_OPTION_UPDATE_URL = RESTUtil.API_BASED_URL + "categories/OPZj38sNHhm/categoryOptions/" + me.PARAM_CATEGORY_OPTION_ID;
-	me.CATEGORY_OPTION_COMBO_UPDATE_URL = RESTUtil.API_BASED_URL + "maintenance/categoryOptionComboUpdate";
+	me.CATEGORY_OPTION_COMBO_UPDATE_URL = RESTUtil.API_BASED_URL + "maintenance/categoryOptionComboUpdate/categoryCombo/W5CScc58WXV";
 
 	me.CATEGORY_OPTION_URL = RESTUtil.API_BASED_URL + "categoryOptions/";
 	me.CAT_OPTION_GROUP_QUERY_URL = RESTUtil.API_BASED_URL + "categoryOptionGroups/" + me.PARAM_CATEGORY_OPTION_GROUP_ID  + "/categoryOptions/" + me.PARAM_CATEGORY_OPTION_ID;
