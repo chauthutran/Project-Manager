@@ -66,7 +66,8 @@ function ProjectManager()
 
 
         // Set up DIALOG form for showing / updating / adding a catOption details
-        Util.setupDialogForm( "Project Details", me.catOptDetailsDivTag, 600, 700, true );
+        var title = ProjectManagerAppTranslation.translate( "projectsForm_tab_name_projectDetails", "Project Details" );
+        Util.setupDialogForm( title, me.catOptDetailsDivTag, 600, 700, true );
 
         me.setup_Events();
     }
@@ -118,7 +119,6 @@ function ProjectManager()
       var startPeriod = year - 20;
       var endPeriod = year + 3;
 
-      me.periodTag.append("<option value=''>[Please choose a option]</option>");
       for( var year=endPeriod; year>=startPeriod; year-- )
       {
         me.periodTag.append("<option value='" + year + "'>" + year + "</option>");
@@ -199,7 +199,8 @@ function ProjectManager()
 
     me.updateCatOptionCombinations = function()
     {
-      MsgManager.appBlock("Updating category option combos ... ");
+      var msg = ProjectManagerAppTranslation.translate( "projectManagerApp_projectDetailsForm_msg_UpdatingCatOptionCombo", "Updating category option combos" );
+      MsgManager.appBlock( msg + " ... " );
       var url = me.CATEGORY_OPTION_COMBO_UPDATE_URL;
 
       RESTUtil.submitData( "PUT",{} , url, function(){ // actionSuccess
@@ -223,7 +224,8 @@ function ProjectManager()
       me.originalList = [];
       me.catOptionList = [];
 
-      me.loadingMsgTag.html("Retrieving data ...");
+      var msg = ProjectManagerAppTranslation.translate( "projectManagerApp_projectDetailsForm_msg_RetrievingData", "Retrieving data" );
+      me.loadingMsgTag.html( msg + " ..." );
       me.hideDataTable();
 
       var ouId = me.orgunitTag.attr("ouId");
@@ -355,7 +357,7 @@ function ProjectManager()
         var foundOption = Util.findItemFromList( projectType.categoryOptions, catOptionData.id, "id" );
         if( foundOption )
         {
-          rowTag.append("<td>" +  projectType.displayName + "</td>");
+          rowTag.append("<td>" + projectType.displayName + "</td>");
           hasProjectType = true;
         }
       }

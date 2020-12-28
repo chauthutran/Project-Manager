@@ -89,9 +89,6 @@ function CatOptionDetailsForm( _projectManagerObj  )
 
         // Open FROM as dialog
 		Util.openDialog( me.catOptDetailsDivTag, true );
-		// $(".fullscreen-btn").closest("button").click();  // Make full screen as soon as the form is opened
-		
-		// me.catOptDetailsDivTag.closest(".ui-dialog").css( "top", 45 );
 	}
 
 	
@@ -106,9 +103,6 @@ function CatOptionDetailsForm( _projectManagerObj  )
 
         // Open FROM as dialog
 		Util.openDialog( me.catOptDetailsDivTag, true );
-		// $(".fullscreen-btn").closest("button").click();  // Make full screen as soon as the form is opened
-		
-		// me.catOptDetailsDivTag.closest(".ui-dialog").css( "top", 45 );
 	}
 
 	// ----------------------------------------------------------------------------------------------
@@ -422,7 +416,8 @@ function CatOptionDetailsForm( _projectManagerObj  )
 	// Add/Update an catOption
 	me.saveCatOptionData = function()
 	{
-		MsgManager.appBlock("Saving project ...");
+		var msg = ProjectManagerAppTranslation.translate( "projectManagerApp_projectDetailsForm_msg_SaveProject", "Saving project" );
+		MsgManager.appBlock( msg + " ..." );
 
 		if( me.catOptionData ) // Update catOption
 		{
@@ -491,8 +486,6 @@ function CatOptionDetailsForm( _projectManagerObj  )
 
 		}, function( error ){ // error
 			me.saveError( errResponse );
-			// MsgManager.appUnblock();
-			// alert("Error occured while updating a project type.\n" + error.statusText );
 		});
 	}
 
@@ -547,7 +540,8 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		}, function( error ){ // error
 			
 			MsgManager.appUnblock();
-			alert("Error occured while updating a project type.\n" + error.statusText );
+			var msg = ProjectManagerAppTranslation.translate( "projectManagerApp_projectDetailsForm_msg_UpdateProjectTypeError", "Error occurred while updating a project type" );
+			alert( msg + "\n" + error.statusText );
 		});
 	}
 
@@ -565,13 +559,14 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			MsgManager.appUnblock();
 			Util.closeDialog( me.catOptDetailsDivTag );
 
-			alert("Save data successfully !");
+			var msg = ProjectManagerAppTranslation.translate( "projectManagerApp_projectDetailsForm_msg_SaveProjectSuccess", "Save project successfully" );
+			alert( msg );
 		}
 	}
 
 	me.saveError = function( errResponse )
 	{
-		var message = "There are some issue while saving data.";
+		var message = ProjectManagerAppTranslation.translate( "projectManagerApp_projectDetailsForm_msg_SaveProjectError", "There are some issue while saving data" );
 
 		var errorReports = errResponse.responseJSON.response.errorReports;
 		if( errorReports.length > 0 )
@@ -586,22 +581,6 @@ function CatOptionDetailsForm( _projectManagerObj  )
 		alert( message );
 		MsgManager.appUnblock();
 	}
-
-	// me.updateCatOptionCombinations = function()
-	// {
-
-	// 	var url = me.CATEGORY_OPTION_COMBO_UPDATE_URL;
-
-	// 	RESTUtil.submitData( "PUT",{} , url, function(){ // actionSuccess
-
-	// 		alert( "Update category option combos successfully.")
-
-	// 	}, function( error ){ // error
-			
-	// 		MsgManager.appUnblock();
-	// 		alert("Error occured while updating catOptionCombos.\n" + error.statusText );
-	// 	});
-	// }
 
 	// ----------------------------------------------------------------------------------------------
 	// For impStrategiesDialog
@@ -819,7 +798,10 @@ function CatOptionDetailsForm( _projectManagerObj  )
 			// Add event for the button
 			buttonTag.click( function(){
 				var dataValue = buttonTag[0].innerText;
-				var ok = confirm("Are you sure you want to delete '" + dataValue + "' ?");
+
+				var msg = ProjectManagerAppTranslation.translate( "projectManagerApp_projectDetailsForm_msg_AskToDeleteProject", "Are you sure you want to delete the project ?" );
+
+				var ok = confirm( msg + "\n'" + dataValue + "'");
 				if( ok )
 				{
 					if( isAddRow ) 

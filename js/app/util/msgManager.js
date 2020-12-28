@@ -15,7 +15,7 @@ MsgManager.cssBlock_Body = {
 
 MsgManager.appBlock = function( msg )
 {
-	if ( msg ) msg = "Processing..";
+	if ( !msg ) msg = "Processing..";
 
 	FormBlock.block( true, msg, MsgManager.cssBlock_Body );
 }

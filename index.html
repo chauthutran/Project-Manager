@@ -11,22 +11,10 @@
 
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="js/jQuery/jquery.blockUI.js"></script>
-
-<!-- <link type="text/css" rel="stylesheet" media="screen" href="../dhis-web-commons/javascripts/jQuery/ui/css/redmond/jquery-ui.css">
-<link type="text/css" rel="stylesheet" media="screen" href="../dhis-web-commons/javascripts/jQuery/calendars/css/jquery.calendars.picker.css">
-<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/jquery.min.js"></script>
-<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/jquery.utils.js"></script>
-<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/jquery.metadata.js"></script>
-<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/ui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../../../dhis-web-commons/javascripts/jQuery/ui/jquery.blockUI.js"></script> -->
-
-
 
 
 <script src="js/app/util/validationUtil.js"></script>
@@ -34,6 +22,7 @@
 <script src="js/app/util/dateUtil.js"></script>
 <script src="js/app/util/RESTUtil.js"></script>
 <script src="js/app/util/msgManager.js"></script>
+<script src="js/app/projectManagerAppTranslation.js"></script>
 <script src="js/app/appHeader.js"></script>
 <script src="js/app/projectManager.js"></script>
 <script src="js/app/catOptionDetails.js"></script>
@@ -58,8 +47,8 @@
 		</div>
 		
 		<div class="header-right">
-			<a href="https://docs.google.com/document/d/1VZzJlsL7IrEw6LzkIy-G0aJqz8VR2MZJH_u32ojarPE/edit#" target="_blank" style="color: White;font-weight:normal;font-size:11px;" title="App version number (Click for version detail page)">v <span id="currentVersion">1.01</span></a>
-				| <button name="backToMainPage"><span title="Close this app and go back to home page.">Close</span></button>
+			<a href="https://docs.google.com/document/d/1VZzJlsL7IrEw6LzkIy-G0aJqz8VR2MZJH_u32ojarPE" target="_blank" style="color: White;font-weight:normal;font-size:11px;" title="App version number (Click for version detail page)">v <span id="currentVersion">0.2</span></a>
+				| <button name="backToMainPage"><span title="Close this app and go back to home page." keyword="opt_c:projectManagerApp_btn_Close">Close</span></button>
 		</div>
 		
 	</div>
@@ -70,18 +59,22 @@
 		<div class="param-area">
 			<table>
 				<tr>
-					<td><h3>Project Manager</h3></td>
+					<td><h3 keyword="opt_c:projectManagerApp_AppName">Project Manager</h3></td>
 				</tr>
 				<tr>
-					<td><label for="orgunit">Entity</label></td>
-					<td><label for="period">Year</label></td>
+					<td><label for="orgunit" keyword="opt_c:projectManagerApp_param_label_Entity">Entity</label></td>
+					<td><label for="period" keyword="opt_c:projectManagerApp_param_label_Year">Year</label></td>
 				</tr>
 				<tr>
-					<td><input id="orgunit" placeholder="Enter to search" mandatory="true"></td>
-					<td><select id="period" mandatory="true"></select></td>
+					<td><input id="orgunit" placeholder="Enter to search" mandatory="true" keyword-placeholder="opt_c:commons_terms_msg_EnterToSearch"></td>
 					<td>
-						<button class="btn btn-primary" id="searchBtn">Search</button>
-						<button class="btn btn-warning" id="updateCatOptionComboBtn">Update Cat Option Combos</button>
+						<select id="period" mandatory="true">
+							<option value="" keyword="opt_c:commons_tems_option_PleaseSelect"></option>
+						</select>
+					</td>
+					<td>
+						<button class="btn btn-primary" id="searchBtn" keyword="opt_c:projectManagerApp_params_btn_Search">Search</button>
+						<button class="btn btn-warning" id="updateCatOptionComboBtn" keyword="opt_c:projectManagerApp_params_btn_UpdateCatOptionCombos">Update Cat Option Combos</button>
 					</td>
 				</tr>
 			</table>
@@ -100,11 +93,11 @@
 		<table class="data-list" id="catOptionListTb" style="display:none;">
 			<thead>
 				<tr>
-					<th>Project Number</th>
-					<th>Project Name</th>
-					<th>Start Date</th>
-					<th>End Date</th>
-					<th>Type</th>
+					<th keyword="opt_c:projectsForm_projectDetails_label_ProjectNumber">Project Number</th>
+					<th keyword="opt_c:projectsForm_projectDetails_label_ProjectName">Project Name</th>
+					<th keyword="opt_c:projectsForm_projectDetails_label_StartDate">Start Date</th>
+					<th keyword="opt_c:projectsForm_projectDetails_label_EndDate">End Date</th>
+					<th keyword="opt_c:projectsForm_projectDetails_label_ProjectType">Type</th>
 					<th>Flag 1</th>
 					<th>Flag 2</th>
 					<th>Flag 3</th>
@@ -118,7 +111,7 @@
 		<!-- Add button -->
 		<div style="width:100%;text-align:right;padding-top: 10px;padding-bottom: 20px;">
 			<!-- span id="totalProjectNo" style="font-style: italic;font-weight: bold;"></span><br> -->
-			<button class="btn btn-primary" id="addNewCatOptionBtn" style="margin-top: 10px;display:none;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt:vI9siTdorSG"> Add New Project</span></button>
+			<button class="btn btn-primary" id="addNewCatOptionBtn" style="margin-top: 10px;display:none;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt_c:projectManagerApp_btn_AddNewProject"> Add New Project</span></button>
 		</div>
 	</div>
 
@@ -130,13 +123,13 @@
 		<table class="catOption-details">
 			<!-- <thead>
 				<tr>
-					<th colspan='5' keyword="opt:A9iqiKIprTh">Project Details</th>
+					<th colspan='5' keyword="opt_c:projectsForm_tab_name_projectDetails">Project Details</th>
 				</tr>
 			<thead> -->
 			
 			<tbody>
 				<tr class="title">
-					<td colspan="5"><label keyword="opt:sMlGJGkzB9v">Project Name</label></td>
+					<td colspan="5"><label keyword="opt_c:projectsForm_projectDetails_label_ProjectName">Project Name</label></td>
 				</tr>
 				<tr>
 					<td colspan="5"><span style="font-style: italic;">PRJ - </span><input type="text" id="name" maxlength="100" style="width:90%;"></td>
@@ -144,10 +137,10 @@
 				
 				
 				<tr class="title">
-					<td><label keyword="opt:E4Ff4ytGr0A">Short Name</label></td>
-					<td><label keyword="opt:SkYkkx3qDyh">Project Number</label></td>
-					<td><label keyword="opt:jKBCC1IkLCB">Start Date</label></td>
-					<td><label keyword="opt:gdGTDs6secU">End Date</label></td>
+					<td><label keyword="opt_c:projectsForm_projectDetails_label_ShortName">Short Name</label></td>
+					<td><label keyword="opt_c:projectsForm_projectDetails_label_ProjectNumber">Project Number</label></td>
+					<td><label keyword="opt_c:projectsForm_projectDetails_label_StartDate">Start Date</label></td>
+					<td><label keyword="opt_c:projectsForm_projectDetails_label_EndDate">End Date</label></td>
 					<td></td>
 				</tr>
 				<tr>
@@ -160,10 +153,10 @@
 					<td><input type="text" id="endDate" style="width:80%;" readonly>
 						<button class="delete-date-icon">x</button>
 					</td>
-					<td><input type="checkbox" id="onGoing"> <label for="onGoing" keyword="opt:e2vH7dQUXJ1">On Going</label></td>
+					<td><input type="checkbox" id="onGoing"> <label for="onGoing" keyword="opt_c:projectsForm_projectDetails_label_OnGoing">On Going</label></td>
 				</tr>
 				<tr class="title">
-					<td colspan="2"><label keyword="opt:ToRfbjJS35h">Project Type <span style="color:red">*</span></label></td>
+					<td colspan="2"><label keyword="opt_c:projectsForm_projectDetails_label_ProjectType">Project Type <span style="color:red">*</span></label></td>
 					<!-- <td><label>Flag 1</label></td>
 					<td><label>Flag 2</label></td>
 					<td><label>Flag 3</label></td> -->
@@ -197,7 +190,7 @@
 		<table class="imp-details" id="implStategies">
 		<thead>
 			<tr>
-			<th keyword="opt:xIQampcKDHE">Implementation Strategies</th>
+			<th keyword="opt_c:projectsForm_projectDetails_label_ImplementationStrategies">Implementation Strategies</th>
 			</tr>
 			<thead>
 			
@@ -206,7 +199,7 @@
 
 		<!-- Add button -->
 		<div style="width:100%;text-align:right">
-			<button class="btn btn-primary" id="implStrategiesShowDialogBtn" style="margin-top: 10px;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt:vI9siTdorSG">Add</span></button>
+			<button class="btn btn-primary" id="implStrategiesShowDialogBtn" style="margin-top: 10px;"><span class="glyphicon glyphicon-plus"> </span><span keyword="opt_c:commons_terms_btn_Add">Add</span></button>
 		</div>
 		
 
@@ -217,13 +210,13 @@
 
 			<div class="form-group">
 				<select class="form-control" id="implStrategiesGroup">
-					<option value="">[Please select]</option>
+					<option value="" keyword="opt_c:commons_tems_option_PleaseSelect">[Please select]</option>
 				</select>
 			</div>
 			<div class="form-group" id="implStrategiesOOption" style="height:250px;overflow-y:auto;border:1px solid #dcd8d8"></div>
 
-			<button class="btn btn-primary" id="addImplStrategiesBtn" keyword="opt:KqY9dEjWhSe">Submit</button>
-			<button class="btn btn-default" id="closeImplStrategiesBtn" keyword="opt:D0aws2oDGCl">Cancel</button>
+			<button class="btn btn-primary" id="addImplStrategiesBtn" keyword="opt_c:commons_terms_btn_Submit">Submit</button>
+			<button class="btn btn-default" id="closeImplStrategiesBtn" keyword="opt_c:commons_terms_btn_Cancel">Cancel</button>
 
 		</div>
 	
@@ -236,7 +229,7 @@
 		<table class="target-populations" id="targetPopulations">
 		<thead>
 			<tr>
-			<th colspan='3' keyword="opt:EoclirmyFg0">Target Populations</th>
+			<th colspan='3' keyword="opt_c:projectsForm_projectDetails_label_TargetPopulations">Target Populations</th>
 			</tr>
 			<thead>
 			
@@ -249,7 +242,7 @@
 
 		<!-- Add button  -->
 		<div style="width:100%;text-align:right">
-			<button class="btn btn-primary" id="targetPopulationsShowDialogBtn" style="margin-top: 10px;"><span class="glyphicon glyphicon-plus"> </span> <span keyword="opt:vI9siTdorSG">Add</span></button>
+			<button class="btn btn-primary" id="targetPopulationsShowDialogBtn" style="margin-top: 10px;"><span class="glyphicon glyphicon-plus"> </span> <span keyword="opt_c:commons_terms_btn_Add">Add</span></button>
 		</div>
 		
 
@@ -260,8 +253,8 @@
 
 			<div class="form-group" id="targetPopulationsOOption" style="height:220px;overflow-y:auto;border:1px solid #dcd8d8"></div>
 
-			<button class="btn btn-primary" id="addTargetPopulationsBtn" keyword="opt:KqY9dEjWhSe">SUBMIT</button>
-			<button class="btn btn-default" id="closeTargetPopulationsBtn" keyword="opt:D0aws2oDGCl">CANCEL</button>
+			<button class="btn btn-primary" id="addTargetPopulationsBtn" keyword="opt_c:commons_terms_btn_Submit">SUBMIT</button>
+			<button class="btn btn-default" id="closeTargetPopulationsBtn" keyword="opt_c:commons_terms_btn_Cancel">CANCEL</button>
 
 		</div>
 
@@ -272,9 +265,9 @@
 		<hr style="border-top: 1px solid black;">
 
 		<div style="width:100%;text-align:right;margin-bottom: 50px;">
-			<button class="btn btn-warning" id="cancelBtn" style="margin-top: 10px;display:none">Cancel</button>
-			<button class="btn btn-primary" id="editBtn" style="margin-top: 10px;">Edit</button>
-			<button class="btn btn-primary" id="saveBtn" style="margin-top: 10px;display:none">Save</button>
+			<button class="btn btn-warning" id="cancelBtn" style="margin-top: 10px;display:none" keyword="opt_c:commons_terms_btn_Cancel">Cancel</button>
+			<button class="btn btn-primary" id="editBtn" style="margin-top: 10px;" keyword="opt_c:projectsForm_projectDetails_btn_Edit">Edit</button>
+			<button class="btn btn-primary" id="saveBtn" style="margin-top: 10px;display:none" keyword="opt_c:commons_terms_btn_Save">Save</button>
 		</div>
 
 	</div>
@@ -289,8 +282,10 @@
 
 	$( document ).ready( function() 
 	{
-		new AppHeader();
-		new ProjectManager();
+		new ProjectManagerAppTranslation( function(){
+			new AppHeader();
+			new ProjectManager();
+		});
 	});
 </script>
 </html>
